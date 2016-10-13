@@ -1,129 +1,15 @@
-/*General*/
-
-body {
-	margin-bottom: 50px;
+/*Extend the top navigation bar downward, in order to seat bigger logo*/
+.navbar-nav {
+    margin: 0px;
+    padding-top: 25px;
+    height: 100px;
 }
 
-
-/*Technician Sign in Form*/
-.form-signin {
-    padding: 15px;
-    margin: 0px auto;
-    max-width: 350px;
+.navbar-brand img {
+    width: 283px;
+    height: 95px;
 }
 
-.loginErr {
-	text-align: center;
-    padding: 5px;
+.navbar-brand {
+    padding: 2.5px;
 }
-​
-.navbar {
-    margin-bottom: 0 !important;
-}
-
-.left-align {
-	text-align: left;
-}
-
-/*Home Page Circles*/
-.circles .col-lg-4 {
-	margin-top: 50px;
-  	margin-bottom: 20px;
-  	text-align: center;
-}
-
-.circles.container {
-	margin-bottom: 50px;
-}
-
-#built-by {
-		float: left !important;
-	}
-	#footer-btn {
-		text-align: center !important;
-		float: right !important;
-	}
-
-/*Panel Buttons*/
-
-.panel-heading a:after {
-    font-family:'Glyphicons Halflings';
-    content:"\e114";
-    float: right;
-    color: gray;
-}
-.panel-heading a.collapsed:after {
-    content:"\e080";
-}
-/* Error/Status */
-.white-jumbotron {
-	background-color: #FFFFFF;
-}
-
-
-
-/*Mobile Phone size*/
-
-@media only screen and (max-width: 374px) {
-	.navbar {
-    margin-bottom: 0 !important;
-}
-	.navbar-brand > img {
-	  		display: block;
-	 		width: 190px;
-	}
-}
-
-/*Desktop screen +*/
-
-@media only screen and (min-width: 768px) {
-	.navbar {
-    margin-bottom: 0 !important;
-}
-	.navbar-nav {
- 		margin: 0px;
- 		padding-top: 15px;
- 		height: 100px;
- 		margin-bottom: 0;
-
-}
-
-.jumbotron-text-offset {
-	padding-left: 60px;
-}
-}
-
-/*Tablet Screen*/
-@media only screen and (max-width: 767px) {
-	.navbar {
-    margin-bottom: 0 !important;
-}
-	
-	div.navbar-header {
-		height: 100px;
-	}
-
-	.navbar-brand {
-	  padding-top: 25px;
-	}
-	/*Hide built by on small devices*/
-	#built-by {
-		display: none;
-	}
-	#footer-btn {
-		text-align: center !important;
-		float: left !important;
-		width: 100%;
-	}
-
-	.jumbotron-text-offset {
-	padding-left: 60px;
-}
-}
-
-/*Footer*/
-	.navbar.navbar-fixed-bottom {
-		margin: 0px;
-	    height: 50px;
-	    padding-top: 0px;
-	}
