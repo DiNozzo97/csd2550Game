@@ -1,15 +1,27 @@
-/*Extend the top navigation bar downward, in order to seat bigger logo*/
+/* Extend the top navigation bar downward, in order to seat bigger logo */
 .navbar-nav {
     margin: 0px;
     padding-top: 25px;
     height: 100px;
 }
 
+/* Set the Logo Size */
 .navbar-brand img {
     width: 283px;
     height: 95px;
 }
 
+/* Add padding around the logo */
 .navbar-brand {
     padding: 2.5px;
+}
+
+/* Removes the blue outline from active links/nav items */
+a:focus {
+    outline:0;
+}
+
+/* Remove the lower margin from the NavBar*/
+.navbar {
+    margin-bottom: 0px;
 }
