@@ -38,7 +38,12 @@ a:focus {
     text-align: center;
 }
 
-/* Center the text inputs/button on the forms */
+/* Space out navigation icons */
+.glyphicon.nav-icon  {
+    padding-left: 10px;
+}
+
+/* Sort out Form Formatting */
 .form-control.sign-in {
     margin: auto;
     width: 70%;
@@ -61,15 +66,21 @@ a:focus {
     margin: auto;
 }
 
-.checkbox.register {
+.checkbox {
     text-align: center;
     margin-bottom: 10px;
 }
 
 .checkbox label {
     padding-left: 0px;
+    margin-bottom: 10px;
 }
 
+.settingsButtons {
+    margin: auto;
+    text-align: center;
+}
 
-
-
+.btn.settings.inlineSettings {
+    width: 80px;
+}

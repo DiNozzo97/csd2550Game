@@ -48,7 +48,7 @@
             function checkLoginStatus() {
                 if (sessionStorage.signedIn == "true") {
                     // Fetch the name of the current user and add it to the Navigation Bar Display
-                    document.getElementById("navUserNameDisplay").innerHTML = sessionStorage.currentFirstName + " " + sessionStorage.currentLastName;
+                    $("#navUserNameDisplay").html(sessionStorage.currentFirstName);
 
                     // Display the 'signed in' version of the navigation bar (and hide the guest version)if the user is signed in and vice versa
                     $("#guestNavButton").hide();
@@ -107,10 +107,9 @@
                     $('#registerModal').modal('hide');
                 });
 
-                // Make the publickScores checkbox into a switch
+                // Make the checkboxs into switches switch
                 $("#publicScoresRegister").bootstrapSwitch();
-
-
+                $("#publicScoresSettings").bootstrapSwitch();
 
             });
         </script>
@@ -135,7 +134,7 @@
                         <form class="form-horizontal">
                             <input type="email" class="form-control text-center sign-in" id="email" placeholder="Email Address">
                             <input type="password" class="form-control text-center sign-in" id="pwd" placeholder="Password">
-                            <button type="submit" class="btn btn-info sign-in">Sign In</button>
+                            <button id="signInButton" type="button" class="btn btn-info sign-in">Sign In</button>
 
                         </form>
                     </div><!-- /.modal-body -->
@@ -169,7 +168,7 @@
                                 <input class="pull-right" type="checkbox" value="true" id="publicScoresRegister" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">
                             </div><!-- /.checkbox -->
 
-                            <button type="submit" class="btn btn-info register">Register</button>
+                            <button id="registerButton"type="button" class="btn btn-info register">Register</button>
 
                         </form>
                     </div><!-- /.modal-body -->
@@ -196,6 +195,7 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Score</th>
+                                    <th>Location</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -207,12 +207,13 @@
         </div><!-- /#scoresModal -->
 
         <!-- Modal displayed for the user to adjust user settings -->
-        <div id="registerModal" class="modal fade" data-keyboard="false">
+        <div id="settingsModal" class="modal fade" data-keyboard="false">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                         <h2 class="modal-title">Settings</h2>
+                        <p class="help-block text-center">Edit the information below to update your profile. <br>If you wish to change your password, enter your new password and then confirm it, <br> otherwise your password will remain.</p>
                     </div><!-- /.modal-header -->
                     <div class="modal-body">
                         <div id="settingsAlert"></div>
@@ -222,23 +223,47 @@
                             <input type="email" class="form-control text-center register" id="emailRegister" placeholder="Email Address">
                             <input type="password" class="form-control text-center register" id="passwordRegister" placeholder="Password">
                             <input type="password" class="form-control text-center register" id="confirmPasswordRegister" placeholder="Confirm Password">
+                            <div class="settingsButtons">
+                                <button id="clearScoresSettingsButton" type="button" class="btn btn-danger settings">Clear My Scores</button>
+                                <button data-toggle="modal" data-target="#signInModal" id="deleteAccountSettingsButton" type="button" class="btn btn-danger settings">Delete My Account</button>
+                            </div>
+
 
                             <div class="checkbox register">
                                 <label for="publicScoresRegister">Post my scores to the public scoreboard</label>
-                                <input class="pull-right" type="checkbox" value="true" id="publicScoresRegister" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">
+                                <input class="pull-right" type="checkbox" value="true" id="publicScoresSettings" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">
                             </div><!-- /.checkbox -->
+                            <div class="settingsButtons">
+                                <button id="saveSettingsButton" type="button" class="btn btn-success inlineSettings settings">Save</button>
+                                <button id="cancelSettingsButton" type="button" class="btn btn-danger inlineSettings settings">Cancel</button>
+                            </div>
 
-                            <button type="submit" class="btn btn-info register">Register</button>
 
                         </form>
                     </div><!-- /.modal-body -->
-                    <div class="modal-footer">
-                        <p class="help-block">Already have an account? <a id="registerToSignIn" href="#">Sign in!</a></p>
-                    </div><!-- /.modal-footer -->
                 </div><!-- /.modal-content -->
 
             </div><!-- /.modal-dialog -->
         </div><!-- /#settingsModal -->
+
+        <!-- Modal to confirm account Delete -->
+        <div id="deleteAccountModal" class="modal fade" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h2 class="modal-title">Do you really want to delete your account?</h2>
+                    </div><!-- /.modal-header -->
+                    <div class="modal-body">
+                            <div class="settingsButtons">
+                                <button id="yesClearScoresSettingsButton" type="button" class="btn btn-success settings">Yes</button>
+                                <button id="noClearScoresSettingsButton" type="button" class="btn btn-danger settings">No</button>
+                            </div>
+                    </div><!-- /.modal-body -->
+                </div><!-- /.modal-content -->
+
+            </div><!-- /.modal-dialog -->
+        </div><!-- /#deleteAccountModal -->
 
 
         <!-- Display the Footer from the base file -->
