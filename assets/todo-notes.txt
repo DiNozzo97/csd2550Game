@@ -1,0 +1,23 @@
+TO DO:
+- Validate Register Form
+- Validate Sign In Form
+- Sign In Authentication
+- Score Board
+- Make the game!
+
+
+
+
+NOTES:
+
+Sample User Object:
+
+{
+        firstName: "Timbo",
+        lastName: "Cole",
+        emailAddress: "timbo_cole@yahoo.co.uk",
+        passwordSalt: "1234",
+        passwordHash: "d9ffaca46d5990ec39501bcdf22ee7a1",
+        saveScore: true,
+        highScore: 0,
+    }

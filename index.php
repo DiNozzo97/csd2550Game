@@ -18,19 +18,28 @@
         <script src='js/bootstrap.min.js'></script> 
         <!-- Import the Bootstrap-Switch JS Library (THE CODE IN THIS FILE IS NOT MY CODE!) -->
         <script src='js/bootstrap-switch.min.js'></script> 
+        <!-- Import the JQuery MD5 JS Library - used to hash passwords (THE CODE IN THIS FILE IS NOT MY CODE!) -->
+        <script src='js/jquery.md5.js'></script> 
         <script>
 
             // The function resetSessionStorage removes the data of the previously signed in user and resets each value to the default load value
             function resetSessionStorage() {
                 sessionStorage.signedIn = "false";
+                sessionStorage.currentId = "";
                 sessionStorage.currentFirstName = "";
                 sessionStorage.currentLastName = "";
-                sessionStorage.postToScores = "false";
+                sessionStorage.currentEmail = "";
+                sessionStorage.currentPostToScores = "false";
             }
-
+            
             // Check to see if this is a new session and if so initialise session storage
             if (sessionStorage.length == 0) {
                 resetSessionStorage();
+            }
+            
+            // Check to see if the game has been previously run on this computers and if not, initialise local storage
+            if (localStorage.length == 0) {
+                localStorage.users = "[]";
             }
 
             // The function alertActivator will create an alert to notify the user of an action 
@@ -57,6 +66,24 @@
                     $("#guestNavButton").show();
                     $("#signedInNavButton").hide();
                 }
+            }
+            
+            // The addUser function will add a user to local storage (after the data has been validated)
+            function addUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
+                // parse existing JSON array into an object
+                var usersObj = JSON.parse(localStorage.users);
+                var newUSerObj = {
+                                    firstName: firstName,
+                                    lastName: lastName,
+                                    emailAddress: emailAdr,
+                                    passwordSalt: pwdSalt,
+                                    passwordHash: pwdHash,
+                                    saveScore: postScores,
+                                    highScore: 0,
+                                };
+                // add the new user to the usersObj
+                usersObj.push(newUSerObj);
+                localStorage.users = JSON.stringify(usersObj);
             }
 
             // When the page has fully loaded 
@@ -88,7 +115,7 @@
                     activateNavButton("guestNavButton");
                 });
                 $( "#settingsButton" ).click(function() {
-                    activateNavButton("settingsButton");
+                    activateNavButton("signedInNavButton");
                 });
 
                 // When the sign in/scores/settings modal is closed, make play active again
@@ -100,11 +127,6 @@
                 });
                 $('#settingsModal').on('hide.bs.modal', function () {
                     activateNavButton("playButton");
-                });
-
-                // When the user selects that they already have an account on the registraion form, hide the register modal
-                $( "#registerToSignIn" ).click(function() {
-                    $('#registerModal').modal('hide');
                 });
 
                 // Make the checkboxs into switches switch
@@ -173,7 +195,7 @@
                         </form>
                     </div><!-- /.modal-body -->
                     <div class="modal-footer">
-                        <p class="help-block">Already have an account? <a id="registerToSignIn" href="#">Sign in!</a></p>
+                        <p class="help-block">Already have an account? <a id="registerToSignIn" href="#" data-dismiss="modal">Sign in!</a></p>
                     </div><!-- /.modal-footer -->
                 </div><!-- /.modal-content -->
 
@@ -195,7 +217,6 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Score</th>
-                                    <th>Location</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -224,25 +245,20 @@
                             <input type="password" class="form-control text-center register" id="passwordRegister" placeholder="Password">
                             <input type="password" class="form-control text-center register" id="confirmPasswordRegister" placeholder="Confirm Password">
                             <div class="settingsButtons">
-                                <button id="clearScoresSettingsButton" type="button" class="btn btn-danger settings">Clear My Scores</button>
-                                <button data-toggle="modal" data-target="#signInModal" id="deleteAccountSettingsButton" type="button" class="btn btn-danger settings">Delete My Account</button>
+                                <button data-toggle="modal" data-target="#deleteScoresModal" id="clearScoresSettingsButton" type="button" class="btn btn-danger settings">Clear My Scores</button>
+                                <button data-toggle="modal" data-target="#deleteAccountModal" id="deleteAccountSettingsButton" type="button" class="btn btn-danger settings">Delete My Account</button>
                             </div>
-
-
-                            <div class="checkbox register">
+                            <div class="checkbox settings">
                                 <label for="publicScoresRegister">Post my scores to the public scoreboard</label>
                                 <input class="pull-right" type="checkbox" value="true" id="publicScoresSettings" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">
                             </div><!-- /.checkbox -->
                             <div class="settingsButtons">
                                 <button id="saveSettingsButton" type="button" class="btn btn-success inlineSettings settings">Save</button>
-                                <button id="cancelSettingsButton" type="button" class="btn btn-danger inlineSettings settings">Cancel</button>
+                                <button id="cancelSettingsButton" type="button" class="btn btn-danger inlineSettings settings" data-dismiss="modal">Cancel</button>
                             </div>
-
-
                         </form>
                     </div><!-- /.modal-body -->
                 </div><!-- /.modal-content -->
-
             </div><!-- /.modal-dialog -->
         </div><!-- /#settingsModal -->
 
@@ -255,15 +271,34 @@
                         <h2 class="modal-title">Do you really want to delete your account?</h2>
                     </div><!-- /.modal-header -->
                     <div class="modal-body">
-                            <div class="settingsButtons">
-                                <button id="yesClearScoresSettingsButton" type="button" class="btn btn-success settings">Yes</button>
-                                <button id="noClearScoresSettingsButton" type="button" class="btn btn-danger settings">No</button>
-                            </div>
+                        <div class="settingsButtons">
+                            <button id="yesClearScoresSettingsButton" type="button" class="btn btn-success settings">Yes</button>
+                            <button id="noClearScoresSettingsButton" type="button" class="btn btn-danger settings" data-dismiss="modal">No</button>
+                        </div>
                     </div><!-- /.modal-body -->
                 </div><!-- /.modal-content -->
 
             </div><!-- /.modal-dialog -->
         </div><!-- /#deleteAccountModal -->
+
+        <!-- Modal to confirm scoreData Delete -->
+        <div id="deleteScoresModal" class="modal fade" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h2 class="modal-title">Do you really want to delete your scores?</h2>
+                    </div><!-- /.modal-header -->
+                    <div class="modal-body">
+                        <div class="settingsButtons">
+                            <button id="yesClearScoresSettingsButton" type="button" class="btn btn-success settings">Yes</button>
+                            <button id="noClearScoresSettingsButton" type="button" class="btn btn-danger settings" data-dismiss="modal">No</button>
+                        </div>
+                    </div><!-- /.modal-body -->
+                </div><!-- /.modal-content -->
+
+            </div><!-- /.modal-dialog -->
+        </div><!-- /#deleteScoresModal -->
 
 
         <!-- Display the Footer from the base file -->
