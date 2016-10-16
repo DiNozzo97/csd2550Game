@@ -13,19 +13,19 @@
             <ul class="nav navbar-nav navbar-right">
 
                 <!-- Play Link (Returns Home) -->
-                <li><a href="./">Play</a></li>
+                <li id="playButton" class="active"><a href="#">Play</a></li>
 
                 <!-- Scores Link -->
-                <li><a href="#" data-toggle="modal" data-target="#myModal">Scores</a></li>
+                <li id="scoresButton"><a href="#" data-toggle="modal" data-target="#scoresModal">Scores</a></li>
 
                 <!-- Sign In/Register Link (displayed in guest mode) -->
-                <li id="guestNavButton"><a href="#" data-toggle="modal" data-target="#myModal">Sign In/Register</a></li>
+                <li id="guestNavButton"><a href="#" data-toggle="modal" data-target="#signInModal">Sign In/Register</a></li>
 
                 <!-- User Preferences/SignOut button (displayed when a user is signed in) -->
                 <li id="signedInNavButton" class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Welcome <span id="navUserNameDisplay"></span> <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="#">Settings</a></li>
+                        <li id="settingsButton"><a href="#">Settings</a></li>
                         <li class="divider"></li>
                         <li><a id="signOutButton" href="#">Sign Out</a></li>
                     </ul>

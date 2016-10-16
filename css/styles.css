@@ -25,3 +25,51 @@ a:focus {
 .navbar {
     margin-bottom: 0px;
 }
+
+/* Center text in alert bubbles and make the bubble shorter */
+.alert {
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+/* Center modal titles*/
+.modal-title {
+    text-align: center;
+}
+
+/* Center the text inputs/button on the forms */
+.form-control.sign-in {
+    margin: auto;
+    width: 70%;
+    margin-bottom: 10px;
+}
+
+.btn.sign-in {
+    display: block;
+    margin: auto;
+}
+
+.form-control.register {
+    margin: auto;
+    margin-bottom: 10px;
+    width: 70%;
+}
+
+.btn.register {
+    display: block;
+    margin: auto;
+}
+
+.checkbox.register {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.checkbox label {
+    padding-left: 0px;
+}
+
+
+
+
