@@ -25,12 +25,12 @@
             // The function resetSessionStorage removes the data of the previously signed in user and resets each value to the default load value
             function resetSessionStorage() {
                 sessionStorage.signedIn = "false";
-                sessionStorage.currentArrayPosition;
+                sessionStorage.currentArrayPosition = false;
                 sessionStorage.currentId = "";
                 sessionStorage.currentFirstName = "";
                 sessionStorage.currentLastName = "";
                 sessionStorage.currentEmail = "";
-                sessionStorage.currentPostToScores = "false";
+                sessionStorage.currentPostToScores = false;
             }
 
             // Check to see if this is a new session and if so initialise session storage
@@ -40,36 +40,41 @@
 
             // Check to see if the game has been previously run on this computers and if not, initialise local storage
             if (localStorage.length == 0) {
+                localStorage.nextID = 0;
                 localStorage.users = "[]";
                 localStorage.scores = "[]";
             }
 
             // The function processRegistration will validate the inputted data on the Registration form
             function processRegistration() {
-                console.log("Hello World");
                 // Reset any previous validation attempts
-                $( ".has-error" ).removeClass( "has-error" )
+                $( ".has-error" ).removeClass( "has-error" );
                 var validationPassed = true;
+                var totalErrors = [];
                 var emptyFields = [];
                 // Check to see that all of the fields have been filled in
                 if($('#firstNameRegister').val() == ''){
                     $( "#firstNameRegisterGroup" ).addClass( "has-error" );
                     emptyFields.push("First Name");
+                    totalErrors.push("#firstNameRegister");
                     validationPassed = false;
                 }
                 if($('#lastNameRegister').val() == ''){
                     $( "#lastNameRegisterGroup" ).addClass( "has-error" );
                     emptyFields.push("Last Name");
+                    totalErrors.push("#lastNameRegister");
                     validationPassed = false;
                 }
                 if($('#emailRegister').val() == ''){
                     $( "#emailRegisterGroup" ).addClass( "has-error" );
                     emptyFields.push("Email Address");
+                    totalErrors.push("#emailRegister");
                     validationPassed = false;
                 }
                 if($('#passwordRegister').val() == ''){
                     $( "#passwordRegisterGroup" ).addClass( "has-error" );
                     emptyFields.push("Password");
+                    totalErrors.push("#passwordRegister");
                     validationPassed = false;
                 }
 
@@ -78,16 +83,19 @@
                 if (!(/^[-'a-zA-Z ]*$/.test($('#firstNameRegister').val()))) {
                     $( "#firstNameRegisterGroup" ).addClass( "has-error" );
                     invalidNames.push("First Name");
+                    totalErrors.push("#firstNameRegisterGroup");
                     validationPassed = false;
                 }
                 if (!(/^[-'a-zA-Z ]*$/.test($('#lastNameRegister').val()))) {
                     $( "#lastNameRegisterGroup" ).addClass( "has-error" );
                     invalidNames.push("Last Name");
+                    totalErrors.push("#lastNameRegister");
                     validationPassed = false;
                 }
                 if (!(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test($('#emailRegister').val()))) {
                     $( "#emailRegisterGroup" ).addClass( "has-error" );
                     invalidNames.push("Email Address");
+                    totalErrors.push("#emailRegisterGroup");
                     validationPassed = false;
                 }
                 // See if the email address already exists 
@@ -98,6 +106,10 @@
                         duplicateEmail = true;
                         validationPassed = false;
                     }
+                    if (duplicateEmail == true) {
+                        $( "#emailRegisterGroup" ).addClass( "has-error" );
+                        totalErrors.push("#emailRegisterGroup");
+                    }
                 }
 
                 // Validate that the 2 passwords entered match (I am currently not enforcing any password rules other than NOT empty!)
@@ -105,6 +117,7 @@
                 if ($('#passwordRegister').val() != $('#confirmPasswordRegister').val()) {
                     $( "#passwordRegisterGroup" ).addClass( "has-error" );
                     passwordsMatch = false;
+                    totalErrors.push("#passwordRegister");
                     validationPassed = false;
                 }
 
@@ -117,10 +130,11 @@
                         salt += charset.charAt(Math.floor(Math.random() * charset.length));
                     addUser($('#firstNameRegister').val(), $('#lastNameRegister').val(), $('#emailRegister').val(), salt, $.md5(salt + $('#passwordRegister').val()), $("#publicScoresRegister").is(':checked'));
                     $('#registerModal').modal('hide');
+                    alertActivator("signIn", "success", "You have successfully registered your account, sign in below:", false)
                 } else { // If Validation failed
                     var errorMessage = "";
                     if (emptyFields.length > 0) {
-                        errorMessage += "Please enter a value in the ";
+                        errorMessage += "Please complete the ";
                         for (i=0;i < emptyFields.length; i++) {
                             errorMessage += emptyFields[i];
                             if (i < emptyFields.length - 2)
@@ -145,16 +159,29 @@
                         errorMessage += "There is already a user registered with this email address. <br>";
                     }
                     if (passwordsMatch != true) {
-                        errorMessage += "The passwords you have entered do not match. Please try again";
+                        errorMessage += "The passwords you have entered do not match. Please try again.";
                     }
-                    alertActivator("register", "danger", errorMessage);
+                    // Create alert for the user
+                    alertActivator("register", "danger", errorMessage, false);
                     
+                    // Make all valid inputs green
+                    var allInputGroups = ["#firstNameRegisterGroup", "#lastNameRegisterGroup", "#emailRegisterGroup", "#passwordRegisterGroup"];
+                    $.each(allInputGroups, function(index, value) {
+                        if ($.inArray(value, totalErrors) == -1) {
+                            console.log("YAYA");
+                            $( value ).addClass( "has-success" );
+                        }
+                    });
+
                 }
             }
 
             // The function alertActivator will create an alert to notify the user of an action 
-            function alertActivator(location, type, message) {
-                $('#'+location+'Alert').html('<div class="alert alert-'+type+' alert-dismissible fade in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +message+'</div>')
+            function alertActivator(location, type, message, closable) {
+                if (closable == true) 
+                    $('#'+location+'Alert').html('<div class="alert alert-'+type+' alert-dismissible fade in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +message+'</div>');
+                else
+                    $('#'+location+'Alert').html('<div class="alert alert-'+type+' fade in" role="alert">'+message+'</div>');
             }
 
             // The function activateNavButton will add 'active' class to called button and remove 'active' class from other buttons
@@ -183,6 +210,7 @@
                 // parse existing JSON array into an object
                 var usersObj = JSON.parse(localStorage.users);
                 var newUSerObj = {
+                    id: localStorage.nextID,
                     firstName: firstName,
                     lastName: lastName,
                     emailAddress: emailAdr,
@@ -194,6 +222,7 @@
                 // add the new user to the usersObj
                 usersObj.push(newUSerObj);
                 localStorage.users = JSON.stringify(usersObj);
+                localStorage.nextID = parseInt(localStorage.nextID) + 1;
             }
 
             // When the page has fully loaded 
@@ -212,7 +241,7 @@
                 $( "#signOutButton" ).click(function() {
                     resetSessionStorage();
                     checkLoginStatus();
-                    alertActivator("main", "success", "You have successfully signed out!");
+                    alertActivator("main", "success", "You have successfully signed out!", true);
                 });
                 // When the each button is pressed ->  add 'active' class and remove 'active' class from other buttons
                 $( "#playButton" ).click(function() {
@@ -263,21 +292,17 @@
                     </div><!-- /.modal-header -->
                     <div class="modal-body">
                         <div id="signInAlert"></div>
-                        <div id="emailSignInGroup" class="form-group">
+                        <div id="signInGroup" class="form-group">
                             <!-- I have opted to use a text input over an email input, to allow me to implement my own email validation -->
                             <input type="text" class="form-control text-center has-error sign-in" id="emailSignIn" placeholder="Email Address">
-                        </div>
-                        <div id="passwordSignInGroup" class="form-group">
                             <input type="password" class="form-control text-center sign-in" id="passwordSignIn" placeholder="Password">
-                        </div>
+                        </div><!-- /.signInGroup -->
                         <button id="signInButton" type="button" class="btn btn-info sign-in">Sign In</button>
-
                     </div><!-- /.modal-body -->
                     <div class="modal-footer">
                         <p class="help-block">No account? <a href="#" data-toggle="modal" data-target="#registerModal">Create one!</a></p>
                     </div><!-- /.modal-footer -->
                 </div><!-- /.modal-content -->
-
             </div><!-- /.modal-dialog -->
         </div><!-- /#signInModal -->
 
@@ -293,32 +318,28 @@
                         <div id="registerAlert"></div>
                         <div id="firstNameRegisterGroup" class="form-group">
                             <input type="text" class="form-control text-center register" id="firstNameRegister" placeholder="First Name">
-                        </div>
+                        </div><!-- /.firstNameRegisterGroup -->
                         <div id="lastNameRegisterGroup" class="form-group">
                             <input type="text" class="form-control text-center register" id="lastNameRegister" placeholder="Last Name">
-                        </div>
+                        </div><!-- /.lastNameRegisterGroup -->
                         <div id="emailRegisterGroup" class="form-group">
                             <!-- I have opted to use a text input over an email input, to allow me to implement my own email validation -->
                             <input type="text" class="form-control text-center register" id="emailRegister" placeholder="Email Address">
-                        </div>
+                        </div><!-- /.emailRegisterGroup -->
                         <div id="passwordRegisterGroup" class="form-group">
                             <input type="password" class="form-control text-center register" id="passwordRegister" placeholder="Password">
                             <input type="password" class="form-control text-center register" id="confirmPasswordRegister" placeholder="Confirm Password">
-                        </div>
-
+                        </div><!-- /.passwordRegisterGroup -->
                         <div class="checkbox register">
                             <label for="publicScoresRegister">Post my scores to the public scoreboard</label>
                             <input class="pull-right" type="checkbox" value="true" id="publicScoresRegister" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">
                         </div><!-- /.checkbox -->
-
                         <button id="registerButton"type="button" class="btn btn-info register" onclick="processRegistration();">Register</button>
-
                     </div><!-- /.modal-body -->
                     <div class="modal-footer">
                         <p class="help-block">Already have an account? <a id="registerToSignIn" href="#" data-dismiss="modal">Sign in!</a></p>
                     </div><!-- /.modal-footer -->
                 </div><!-- /.modal-content -->
-
             </div><!-- /.modal-dialog -->
         </div><!-- /#registerModal -->
 
@@ -360,22 +381,22 @@
                         <div id="settingsAlert"></div>
                         <div id="firstNameSettingsGroup" class="form-group">
                             <input type="text" class="form-control text-center settings" id="firstNameSettings" placeholder="First Name">
-                        </div>
+                        </div><!-- /.firstNameSettingsGroup -->
                         <div id="lastNameSettingsGroup" class="form-group">
                             <input type="text" class="form-control text-center settings" id="lastNameSettings" placeholder="Last Name">
-                        </div>
+                        </div><!-- /.lastNameSettingsGroup -->
                         <div id="emailSettingsGroup" class="form-group">
                             <!-- I have opted to use a text input over an email input, to allow me to implement my own email validation -->
                             <input type="email" class="form-control text-center settings" id="emailSettings" placeholder="Email Address">
-                        </div>
+                        </div><!-- /.emailSettingsGroup -->
                         <div id="passwordSettingsGroup" class="form-group">
                             <input type="password" class="form-control text-center settings" id="passwordSettings" placeholder="Password">
                             <input type="password" class="form-control text-center settings" id="confirmPasswordSettings" placeholder="Confirm Password">
-                        </div>
+                        </div><!-- /.passwordSettingsGroup -->
                         <div class="settingsButtons">
                             <button data-toggle="modal" data-target="#deleteScoresModal" id="clearScoresSettingsButton" type="button" class="btn btn-danger settings">Clear My Scores</button>
                             <button data-toggle="modal" data-target="#deleteAccountModal" id="deleteAccountSettingsButton" type="button" class="btn btn-danger settings">Delete My Account</button>
-                        </div>
+                        </div><!-- /.settingsButtons -->
                         <div class="checkbox settings">
                             <label for="publicScoresSettings">Post my scores to the public scoreboard</label>
                             <input class="pull-right" type="checkbox" value="true" id="publicScoresSettings" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">
@@ -383,7 +404,7 @@
                         <div class="settingsButtons">
                             <button id="saveSettingsButton" type="button" class="btn btn-success inlineSettings settings">Save</button>
                             <button id="cancelSettingsButton" type="button" class="btn btn-danger inlineSettings settings" data-dismiss="modal">Cancel</button>
-                        </div>
+                        </div><!-- /.settingsButtons -->
                     </div><!-- /.modal-body -->
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -401,10 +422,9 @@
                         <div class="settingsButtons">
                             <button id="yesClearScoresSettingsButton" type="button" class="btn btn-success settings">Yes</button>
                             <button id="noClearScoresSettingsButton" type="button" class="btn btn-danger settings" data-dismiss="modal">No</button>
-                        </div>
+                        </div><!-- /.settingsButtons -->
                     </div><!-- /.modal-body -->
                 </div><!-- /.modal-content -->
-
             </div><!-- /.modal-dialog -->
         </div><!-- /#deleteAccountModal -->
 
@@ -420,10 +440,9 @@
                         <div class="settingsButtons">
                             <button id="yesClearScoresSettingsButton" type="button" class="btn btn-success settings">Yes</button>
                             <button id="noClearScoresSettingsButton" type="button" class="btn btn-danger settings" data-dismiss="modal">No</button>
-                        </div>
+                        </div><!-- /.settingsButtons -->
                     </div><!-- /.modal-body -->
                 </div><!-- /.modal-content -->
-
             </div><!-- /.modal-dialog -->
         </div><!-- /#deleteScoresModal -->
 

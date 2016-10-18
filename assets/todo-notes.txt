@@ -1,5 +1,5 @@
 TO DO:
-- Validate Register Form
+- Validate Settings Form
 - Validate Sign In Form
 - Sign In Authentication
 - Score Board
