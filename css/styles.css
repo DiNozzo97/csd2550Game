@@ -50,21 +50,17 @@ a:focus {
     margin-bottom: 10px;
 }
 
-.btn.sign-in {
+.btn.sign-in, .btn.register {
     display: block;
     margin: auto;
 }
 
-.form-control.register {
+.form-control.register, .form-control.settings {
     margin: auto;
     margin-bottom: 10px;
     width: 70%;
 }
 
-.btn.register {
-    display: block;
-    margin: auto;
-}
 
 .checkbox {
     text-align: center;
