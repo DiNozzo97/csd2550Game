@@ -31,6 +31,7 @@ function processRegistration() {
         invalidNames = [],
         duplicateEmail = false,
         existingUsers = JSON.parse(localStorage.users),
+        lwrEmailAddress = $('#emailRegister').val().toLowerCase(), // Make the email address lowercase, so that it can be used to check for existing records
         emptyFields = [];
     // Check to see that all of the fields have been filled in
     if ($('#firstNameRegister').val() == '') {
@@ -45,7 +46,7 @@ function processRegistration() {
         totalErrors.push("#lastNameRegister");
         validationPassed = false;
     }
-    if ($('#emailRegister').val() == '') {
+    if (lwrEmailAddress == '') {
         $("#emailRegisterGroup").addClass("has-error");
         emptyFields.push("Email Address");
         totalErrors.push("#emailRegister");
@@ -71,7 +72,7 @@ function processRegistration() {
         totalErrors.push("#lastNameRegister");
         validationPassed = false;
     }
-    if (!(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test($('#emailRegister').val()))) {
+    if (!(/^[\w-\.]{1,64}@([\w-]+\.){1,255}[\w-]{2,4}$/.test(lwrEmailAddress))) {
         $("#emailRegisterGroup").addClass("has-error");
         invalidNames.push("Email Address");
         totalErrors.push("#emailRegisterGroup");
@@ -79,7 +80,7 @@ function processRegistration() {
     }
     // See if the email address already exists 
     for (i = 0; i < existingUsers.length; i += 1) {
-        if (existingUsers[i].emailAddress == $('#emailRegister').val()) {
+        if (existingUsers[i].emailAddress == lwrEmailAddress) {
             duplicateEmail = true;
             validationPassed = false;
         }
@@ -105,9 +106,9 @@ function processRegistration() {
         var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@£$%";
         for( i=0; i < 4; i++ )
             salt += charset.charAt(Math.floor(Math.random() * charset.length));
-        addUser($('#firstNameRegister').val(), $('#lastNameRegister').val(), $('#emailRegister').val(), salt, $.md5(salt + $('#passwordRegister').val()), $("#publicScoresRegister").is(':checked'));
+        addUser($('#firstNameRegister').val(), $('#lastNameRegister').val(), lwrEmailAddress, salt, $.md5(salt + $('#passwordRegister').val()), $("#publicScoresRegister").is(':checked'));
         $('#registerModal').modal('hide');
-        alertActivator("signIn", "success", "You have successfully registered your account, sign in below:", false)
+        alertActivator("signIn", "success", "You have successfully registered your account, sign in below:", true)
     } else { // If Validation failed
         var errorMessage = "";
         if (emptyFields.length > 0) {
@@ -161,10 +162,8 @@ function processSignIn() {
         existingUsers = JSON.parse(localStorage.users);
     // Get the value of email address and find it in the user array
     for (i = 0; i < existingUsers.length; i += 1) {
-        console.log("case-2");
-        if (existingUsers[i].emailAddress == $('#emailSignIn').val()) {
+        if (existingUsers[i].emailAddress == $('#emailSignIn').val().toLowerCase()) {
             if (existingUsers[i].passwordHash == ($.md5(existingUsers[i].passwordSalt + $('#passwordSignIn').val()))) {
-                console.log("case1");
                 sessionStorage.signedIn = true;
                 sessionStorage.currentArrayPosition = i;
                 sessionStorage.currentEmail = existingUsers[i].emailAddress;
@@ -177,6 +176,7 @@ function processSignIn() {
                 alertActivator("main", "success", "You have successfuly signed in.", true);
                 $('#signInModal').modal('hide');
                 userAuthenticated = true;
+                $('#signInModal').modal('hide');
             }
         }
     }
