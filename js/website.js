@@ -308,6 +308,19 @@ function editUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
     checkLoginStatus(); //To update the name in navBar if required
 }
 
+// The function resetSettings will initialise the settings data in the input boxs
+function resetSettings() {
+    $('#firstNameSettings').val(sessionStorage.currentFirstName);
+    $('#lastNameSettings').val(sessionStorage.currentLastName);
+    $('#emailSettings').val(sessionStorage.currentEmail);
+    $('#confirmPasswordSettings').val('');
+    $('#passwordSettings').val('');
+    if (sessionStorage.currentPostToScores == "true") 
+        $('#publicScoresSettings').prop('checked', true);
+    else
+        $('#publicScoresSettings').prop('checked', false);
+}
+
 // The function processSignIn will validate the inputted data on the sign in form
 function processSignIn() {
     // Reset any previous validation attempts
@@ -331,15 +344,7 @@ function processSignIn() {
                 alertActivator("main", "success", "You have successfuly signed in.", true);
                 $('#signInModal').modal('hide');
                 userAuthenticated = true;
-                $('#firstNameSettings').val(sessionStorage.currentFirstName);
-                $('#lastNameSettings').val(sessionStorage.currentLastName);
-                $('#emailSettings').val(sessionStorage.currentEmail);
-                $('#confirmPasswordSettings').val('');
-                $('#passwordSettings').val('');
-                if (sessionStorage.currentPostToScores == "true") 
-                    $('#publicScoresSettings').prop('checked', true);
-                else
-                    $('#publicScoresSettings').prop('checked', false);
+                resetSettings();
             }
         }
     }

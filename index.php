@@ -151,7 +151,7 @@
                         </div><!-- /.checkbox -->
                         <div class="settingsButtons">
                             <button id="saveSettingsButton" type="button" class="btn btn-success inlineSettings settings" onclick="processSettings();">Save</button>
-                            <button id="cancelSettingsButton" type="button" class="btn btn-danger inlineSettings settings" data-dismiss="modal">Cancel</button>
+                            <button id="cancelSettingsButton" type="button" class="btn btn-danger inlineSettings settings" data-dismiss="modal" onclick="resetSettings();">Cancel</button>
                         </div><!-- /.settingsButtons -->
                     </div><!-- /.modal-body -->
                 </div><!-- /.modal-content -->
