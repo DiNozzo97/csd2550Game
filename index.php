@@ -150,7 +150,7 @@
                             <input class="pull-right" type="checkbox" value="true" id="publicScoresSettings" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">
                         </div><!-- /.checkbox -->
                         <div class="settingsButtons">
-                            <button id="saveSettingsButton" type="button" class="btn btn-success inlineSettings settings">Save</button>
+                            <button id="saveSettingsButton" type="button" class="btn btn-success inlineSettings settings" onclick="processSettings();">Save</button>
                             <button id="cancelSettingsButton" type="button" class="btn btn-danger inlineSettings settings" data-dismiss="modal">Cancel</button>
                         </div><!-- /.settingsButtons -->
                     </div><!-- /.modal-body -->

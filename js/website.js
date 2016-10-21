@@ -153,6 +153,161 @@ function processRegistration() {
     }
 }
 
+// The function processSettings will validate the inputted data on the Registration form
+function processSettings() {
+    // Reset any previous validation attempts
+    $(".has-error").removeClass("has-error");
+    $(".has-success").removeClass("has-success");
+    var validationPassed = true,
+        totalErrors = [],
+        invalidNames = [],
+        duplicateEmail = false,
+        existingUsers = JSON.parse(localStorage.users),
+        lwrEmailAddress = $('#emailSettings').val().toLowerCase(), // Make the email address lowercase, so that it can be used to check for existing records
+        emptyFields = [];
+    // Check to see that all of the fields have been filled in
+    if ($('#firstNameSettings').val() == '') {
+        $("#firstNameSettingsGroup").addClass("has-error");
+        emptyFields.push("First Name");
+        totalErrors.push("#firstNameSettings");
+        validationPassed = false;
+    }
+    if ($('#lastNameSettings').val() == '') {
+        $("#lastNameSettingsGroup").addClass("has-error");
+        emptyFields.push("Last Name");
+        totalErrors.push("#lastNameSettings");
+        validationPassed = false;
+    }
+    if (lwrEmailAddress == '') {
+        $("#emailSettingsGroup").addClass("has-error");
+        emptyFields.push("Email Address");
+        totalErrors.push("#emailSettings");
+        validationPassed = false;
+    }
+
+    // Validate the firstName/lastName/email
+    if (!(/^[-'a-zA-Z ]*$/.test($('#firstNameSettings').val()))) {
+        $("#firstNameSettingsGroup").addClass("has-error");
+        invalidNames.push("First Name");
+        totalErrors.push("#firstNameSettingsGroup");
+        validationPassed = false;
+    }
+    if (!(/^[-'a-zA-Z ]*$/.test($('#lastNameSettings').val()))) {
+        $("#lastNameSettingsGroup").addClass("has-error");
+        invalidNames.push("Last Name");
+        totalErrors.push("#lastNameSettings");
+        validationPassed = false;
+    }
+    if (!(/^[\w-\.]{1,64}@([\w-]+\.){1,255}[\w-]{2,4}$/.test(lwrEmailAddress))) {
+        $("#emailSettingsGroup").addClass("has-error");
+        invalidNames.push("Email Address");
+        totalErrors.push("#emailSettingsGroup");
+        validationPassed = false;
+    }
+    // See if the email address already exists 
+    for (i = 0; i < existingUsers.length; i += 1) {
+        if ((existingUsers[i].emailAddress == lwrEmailAddress) && (sessionStorage.currentEmail != lwrEmailAddress)) {
+            duplicateEmail = true;
+            validationPassed = false;
+        }
+        if (duplicateEmail == true) {
+            $( "#emailSettingsGroup" ).addClass( "has-error" );
+            totalErrors.push("#emailSettingsGroup");
+        }
+    }
+
+    // Validate that the 2 passwords entered match (I am currently not enforcing any password rules other than NOT empty!)
+    var passwordsMatch = true;
+    if ($('#passwordSettings').val() != $('#confirmPasswordSettings').val()) {
+        $( "#passwordSettingsGroup" ).addClass( "has-error" );
+        passwordsMatch = false;
+        totalErrors.push("#passwordSettings");
+        validationPassed = false;
+    }
+
+    // Finally, if there has been an error, display a message, otherwise generate a Salt and a hash and then add the user.
+    if (validationPassed) {
+        var passwordHash,
+            salt;
+
+        if ($('#passwordSettings').val() == '') {
+            passwordHash = existingUsers[sessionStorage.currentArrayPosition].passwordHash;
+            salt = existingUsers[sessionStorage.currentArrayPosition].passwordSalt;
+
+        } else {
+            // Generate a 4 CHAR SALT
+            salt = "";
+            var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@£$%";
+            for( i=0; i < 4; i++ )
+                salt += charset.charAt(Math.floor(Math.random() * charset.length));
+            passwordHash = $.md5(salt + $('#passwordSettings').val());
+        }
+        editUser($('#firstNameSettings').val(), $('#lastNameSettings').val(), $('#emailSettings').val(), salt, passwordHash, $("#publicScoresSettings").is(':checked'));
+
+        $('#settingsModal').modal('hide');
+        $('.alert.settings').hide();
+        alertActivator("main", "success", "New settings saved!", true)
+    } else { // If Validation failed
+        var errorMessage = "";
+        if (emptyFields.length > 0) {
+            errorMessage += "Please complete the ";
+            for (i=0;i < emptyFields.length; i++) {
+                errorMessage += emptyFields[i];
+                if (i < emptyFields.length - 2)
+                    errorMessage += ", ";
+                else if (i == emptyFields.length - 2)
+                    errorMessage += " and ";
+            }
+            errorMessage += " field(s). <br>";
+        }
+        if (invalidNames.length > 0) {
+            errorMessage += "The value you entered in the ";
+            for (i=0;i < invalidNames.length; i++) {
+                errorMessage += invalidNames[i];
+                if (i < invalidNames.length - 2)
+                    errorMessage += ", ";
+                else if (i == invalidNames.length - 2)
+                    errorMessage += " and ";
+            }
+            errorMessage += " field(s) are invalid. <br>";
+        }
+        if (duplicateEmail == true) {
+            errorMessage += "There is already a user Settingsed with this email address. <br>";
+        }
+        if (passwordsMatch != true) {
+            errorMessage += "The passwords you have entered do not match. Please try again.";
+        }
+        // Create alert for the user
+        alertActivator("settings", "danger", errorMessage, false);
+
+        // Make all valid inputs green
+        var allInputGroups = ["#firstNameSettingsGroup", "#lastNameSettingsGroup", "#emailSettingsGroup", "#passwordSettingsGroup"];
+        $.each(allInputGroups, function(index, value) {
+            if ($.inArray(value, totalErrors) == -1) {
+                $( value ).addClass( "has-success" );
+            }
+        });
+
+    }
+}
+
+function editUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
+    var usersObj = JSON.parse(localStorage.users),
+        arrayPos = sessionStorage.currentArrayPosition;
+    usersObj[arrayPos].firstName = firstName;
+    usersObj[arrayPos].lastName = lastName;
+    usersObj[arrayPos].emailAddress = emailAdr;
+    usersObj[arrayPos].passwordSalt = pwdSalt;
+    usersObj[arrayPos].passwordHash = pwdHash;
+    usersObj[arrayPos].saveScore = postScores;
+    localStorage.users = JSON.stringify(usersObj);
+    sessionStorage.currentEmail = emailAdr;
+    sessionStorage.currentFirstName = firstName;
+    sessionStorage.currentLastName = lastName;
+    sessionStorage.currentPostToScores = postScores;
+    checkLoginStatus(); //To update the name in navBar if required
+}
+
 // The function processSignIn will validate the inputted data on the sign in form
 function processSignIn() {
     // Reset any previous validation attempts
@@ -176,7 +331,15 @@ function processSignIn() {
                 alertActivator("main", "success", "You have successfuly signed in.", true);
                 $('#signInModal').modal('hide');
                 userAuthenticated = true;
-                $('#signInModal').modal('hide');
+                $('#firstNameSettings').val(sessionStorage.currentFirstName);
+                $('#lastNameSettings').val(sessionStorage.currentLastName);
+                $('#emailSettings').val(sessionStorage.currentEmail);
+                $('#confirmPasswordSettings').val('');
+                $('#passwordSettings').val('');
+                if (sessionStorage.currentPostToScores == "true") 
+                    $('#publicScoresSettings').prop('checked', true);
+                else
+                    $('#publicScoresSettings').prop('checked', false);
             }
         }
     }
@@ -190,9 +353,9 @@ function processSignIn() {
 // The function alertActivator will create an alert to notify the user of an action 
 function alertActivator(location, type, message, closable) {
     if (closable == true) 
-        $('#'+location+'Alert').html('<div class="alert alert-'+type+' alert-dismissible fade in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +message+'</div>');
+        $('#'+location+'Alert').html('<div class="alert alert-'+type+' alert-dismissible fade in '+location+'" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +message+'</div>');
     else
-        $('#'+location+'Alert').html('<div class="alert alert-'+type+' fade in" role="alert">'+message+'</div>');
+        $('#'+location+'Alert').html('<div class="alert alert-'+type+' fade in '+location+'" role="alert">'+message+'</div>');
 }
 
 // The function activateNavButton will add 'active' class to called button and remove 'active' class from other buttons
@@ -252,6 +415,7 @@ $( document ).ready(function() {
     $( "#signOutButton" ).click(function() {
         resetSessionStorage();
         checkLoginStatus();
+        $('.alert').hide();
         alertActivator("main", "success", "You have successfully signed out!", true);
     });
     // When the each button is pressed ->  add 'active' class and remove 'active' class from other buttons
