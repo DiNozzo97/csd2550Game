@@ -164,11 +164,11 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h2 class="modal-title">Do you really want to delete your account?</h2>
+                        <h2 class="modal-title">Do you really want to permenantly delete your account and scores?</h2>
                     </div><!-- /.modal-header -->
                     <div class="modal-body">
                         <div class="settingsButtons">
-                            <button id="yesClearScoresSettingsButton" type="button" class="btn btn-success settings">Yes</button>
+                            <button id="yesClearScoresSettingsButton" type="button" class="btn btn-success settings" onclick="deleteCurrentUser();">Yes</button>
                             <button id="noClearScoresSettingsButton" type="button" class="btn btn-danger settings" data-dismiss="modal">No</button>
                         </div><!-- /.settingsButtons -->
                     </div><!-- /.modal-body -->
@@ -182,11 +182,11 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h2 class="modal-title">Do you really want to delete your scores?</h2>
+                        <h2 class="modal-title">Do you really want to permenantly delete your scores?</h2>
                     </div><!-- /.modal-header -->
                     <div class="modal-body">
                         <div class="settingsButtons">
-                            <button id="yesClearScoresSettingsButton" type="button" class="btn btn-success settings">Yes</button>
+                            <button id="yesClearScoresSettingsButton" type="button" class="btn btn-success settings" onclick="deleteScores();">Yes</button>
                             <button id="noClearScoresSettingsButton" type="button" class="btn btn-danger settings" data-dismiss="modal">No</button>
                         </div><!-- /.settingsButtons -->
                     </div><!-- /.modal-body -->

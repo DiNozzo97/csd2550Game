@@ -404,6 +404,46 @@ function addUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
     localStorage.nextID = parseInt(localStorage.nextID) + 1;
 }
 
+// The deleteCurrentUser function will delete a user from local storage
+function deleteCurrentUser() {
+    var usersObj = JSON.parse(localStorage.users);
+    usersObj.splice(sessionStorage.currentArrayPosition, 1);
+    localStorage.users = JSON.stringify(usersObj);
+    deleteScores();
+    resetSessionStorage();
+    checkLoginStatus();
+    $('.modal').modal('hide');
+    alertActivator("main", "danger", "Your account has been deleted", true);
+}
+
+// The deleteScores function will delete the currently signed in users scores from the scoreboard
+function deleteScores() {
+    console.log("Function run");
+    var scoresObj = JSON.parse(localStorage.scores),
+        scoreArrayPositions = [];
+    if (scoresObj.length == 0) {
+        console.log("scores obj length = 0");
+        return;
+    }
+
+    for (i = 0; i < scoresObj.length; i++ ) {
+        console.log("for loop");
+        if (scoresObj[i].userId == sessionStorage.currentId) {
+            console.log("if current ID score");
+            scoreArrayPositions.push(i);
+        }
+    }
+
+    $.each(scoreArrayPositions, function( index, value ) {
+        console.log("Currently working on:  " + value);
+        console.table(scoresObj);
+        scoresObj.splice(value, 1);
+    });
+    localStorage.scores = JSON.stringify(scoresObj);
+}
+
+
+
 // When the page has fully loaded 
 $( document ).ready(function() {
     // Check whether a user is signed in (in order to show the correct NavBar)

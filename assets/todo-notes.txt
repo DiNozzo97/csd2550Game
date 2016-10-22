@@ -21,3 +21,11 @@ Sample User Object:
         saveScore: true,
         highScore: 0,
     }
+    
+Sample Score Object: 
+
+{
+        userId: 2,
+        name: "Timbo Cole",
+        score: 50,
+    }
