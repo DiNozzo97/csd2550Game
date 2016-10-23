@@ -388,7 +388,7 @@ function checkLoginStatus() {
 function addUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
     // parse existing JSON array into an object
     var usersObj = JSON.parse(localStorage.users);
-    var newUSerObj = {
+    var newUserObj = {
         id: localStorage.nextID,
         firstName: firstName,
         lastName: lastName,
@@ -399,9 +399,23 @@ function addUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
         highScore: 0,
     };
     // add the new user to the usersObj
-    usersObj.push(newUSerObj);
+    usersObj.push(newUserObj);
     localStorage.users = JSON.stringify(usersObj);
     localStorage.nextID = parseInt(localStorage.nextID) + 1;
+}
+
+// The saveScore function will save a score to local storage
+function saveScore(score) {
+    // parse existing JSON array into an object
+    var scoresObj = JSON.parse(localStorage.scores);
+    var newScoreObj = {
+        userId: sessionStorage.currentId,
+        name: sessionStorage.currentFirstName +" "+sessionStorage.currentLastName,
+        score: score
+    };
+    // add the new score to the scoresObj
+    scoresObj.push(newScoreObj);
+    localStorage.scores = JSON.stringify(scoresObj);
 }
 
 // The deleteCurrentUser function will delete a user from local storage
@@ -418,28 +432,18 @@ function deleteCurrentUser() {
 
 // The deleteScores function will delete the currently signed in users scores from the scoreboard
 function deleteScores() {
-    console.log("Function run");
-    var scoresObj = JSON.parse(localStorage.scores),
-        scoreArrayPositions = [];
-    if (scoresObj.length == 0) {
-        console.log("scores obj length = 0");
-        return;
-    }
+    var existingScoresObj = JSON.parse(localStorage.scores),
+        newScoresObj = [];
 
-    for (i = 0; i < scoresObj.length; i++ ) {
-        console.log("for loop");
-        if (scoresObj[i].userId == sessionStorage.currentId) {
-            console.log("if current ID score");
-            scoreArrayPositions.push(i);
+
+    for (i = 0; i < existingScoresObj.length; i++ ) {
+        if (existingScoresObj[i].userId != sessionStorage.currentId) {
+            console.log(i);
+            newScoresObj.push(existingScoresObj[i]);
         }
     }
 
-    $.each(scoreArrayPositions, function( index, value ) {
-        console.log("Currently working on:  " + value);
-        console.table(scoresObj);
-        scoresObj.splice(value, 1);
-    });
-    localStorage.scores = JSON.stringify(scoresObj);
+    localStorage.scores = JSON.stringify(newScoresObj);
 }
 
 
