@@ -1,8 +1,5 @@
 TO DO:
-- Validate Settings Form
-- Validate Sign In Form
-- Sign In Authentication
-- Score Board
+- Code prettying up
 - Make the game!
 
 

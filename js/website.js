@@ -109,6 +109,7 @@ function processRegistration() {
         addUser($('#firstNameRegister').val(), $('#lastNameRegister').val(), lwrEmailAddress, salt, $.md5(salt + $('#passwordRegister').val()), $("#publicScoresRegister").is(':checked'));
         $('#registerModal').modal('hide');
         alertActivator("signIn", "success", "You have successfully registered your account, sign in below:", true)
+        $("#registerForm").trigger('reset');
     } else { // If Validation failed
         var errorMessage = "";
         if (emptyFields.length > 0) {
@@ -246,6 +247,7 @@ function processSettings() {
 
         $('#settingsModal').modal('hide');
         $('.alert.settings').hide();
+        resetSettings();
         alertActivator("main", "success", "New settings saved!", true)
     } else { // If Validation failed
         var errorMessage = "";
@@ -316,9 +318,9 @@ function resetSettings() {
     $('#confirmPasswordSettings').val('');
     $('#passwordSettings').val('');
     if (sessionStorage.currentPostToScores == "true") 
-        $('#publicScoresSettings').prop('checked', true);
+        $('#publicScoresSettings').bootstrapSwitch('state', true);
     else
-        $('#publicScoresSettings').prop('checked', false);
+        $('#publicScoresSettings').bootstrapSwitch('state', false);
 }
 
 // The function processSignIn will validate the inputted data on the sign in form
@@ -344,6 +346,7 @@ function processSignIn() {
                 alertActivator("main", "success", "You have successfuly signed in.", true);
                 $('#signInModal').modal('hide');
                 userAuthenticated = true;
+                $("#signInForm").trigger('reset');
                 resetSettings();
             }
         }
@@ -438,13 +441,33 @@ function deleteScores() {
 
     for (i = 0; i < existingScoresObj.length; i++ ) {
         if (existingScoresObj[i].userId != sessionStorage.currentId) {
-            console.log(i);
             newScoresObj.push(existingScoresObj[i]);
         }
     }
 
     localStorage.scores = JSON.stringify(newScoresObj);
+    $('#deleteScoresModal').modal('hide');
+    alertActivator("settings", "success", "Scores Deleted!", true);
+
 }
+
+// The displayScores function will sort and display the scores on the 'Scores' modal
+function displayScores() {
+    var scoresObj = JSON.parse(localStorage.scores),
+        counter = 0;
+    scoresObj.sort(function(no1, no2){
+        return no2.score - no1.score
+    });
+    $("#scoresTableBody").empty();
+    $.each(scoresObj, function( index, value ) {
+        if (counter < 10) {
+            $("#scoresTableBody").append("<tr><td>"+value.name+"</td><td>"+value.score+"</td></tr>");
+            counter++;
+        }
+    });
+
+}
+
 
 
 
@@ -473,12 +496,14 @@ $( document ).ready(function() {
     });
     $( "#scoresButton" ).click(function() {
         activateNavButton("scoresButton");
+        displayScores();
     });
     $( "#guestNavButton" ).click(function() {
         activateNavButton("guestNavButton");
     });
     $( "#settingsButton" ).click(function() {
         activateNavButton("signedInNavButton");
+        resetSettings();
     });
 
     // When the sign in/scores/settings modal is closed, make play active again

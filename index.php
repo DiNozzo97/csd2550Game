@@ -40,12 +40,14 @@
                     </div><!-- /.modal-header -->
                     <div class="modal-body">
                         <div id="signInAlert"></div>
-                        <div id="signInGroup" class="form-group">
-                            <!-- I have opted to use a text input over an email input, to allow me to implement my own email validation -->
-                            <input type="text" class="form-control text-center has-error sign-in" id="emailSignIn" placeholder="Email Address">
-                            <input type="password" class="form-control text-center sign-in" id="passwordSignIn" placeholder="Password">
-                        </div><!-- /.signInGroup -->
-                        <button id="signInButton" type="button" class="btn btn-info sign-in" onclick="processSignIn();">Sign In</button>
+                        <form id="signInForm" onsubmit="processSignIn(); return false;">
+                            <div id="signInGroup" class="form-group">
+                                <!-- I have opted to use a text input over an email input, to allow me to implement my own email validation -->
+                                <input type="text" class="form-control text-center has-error sign-in" id="emailSignIn" placeholder="Email Address">
+                                <input type="password" class="form-control text-center sign-in" id="passwordSignIn" placeholder="Password">
+                            </div><!-- /.signInGroup -->
+                            <button id="signInButton" type="submit" class="btn btn-info sign-in">Sign In</button>
+                        </form>
                     </div><!-- /.modal-body -->
                     <div class="modal-footer">
                         <p class="help-block">No account? <a href="#" data-toggle="modal" data-target="#registerModal">Create one!</a></p>
@@ -64,25 +66,27 @@
                     </div><!-- /.modal-header -->
                     <div class="modal-body">
                         <div id="registerAlert"></div>
-                        <div id="firstNameRegisterGroup" class="form-group">
-                            <input type="text" class="form-control text-center register" id="firstNameRegister" placeholder="First Name">
-                        </div><!-- /.firstNameRegisterGroup -->
-                        <div id="lastNameRegisterGroup" class="form-group">
-                            <input type="text" class="form-control text-center register" id="lastNameRegister" placeholder="Last Name">
-                        </div><!-- /.lastNameRegisterGroup -->
-                        <div id="emailRegisterGroup" class="form-group">
-                            <!-- I have opted to use a text input over an email input, to allow me to implement my own email validation -->
-                            <input type="text" class="form-control text-center register" id="emailRegister" placeholder="Email Address">
-                        </div><!-- /.emailRegisterGroup -->
-                        <div id="passwordRegisterGroup" class="form-group">
-                            <input type="password" class="form-control text-center register" id="passwordRegister" placeholder="Password">
-                            <input type="password" class="form-control text-center register" id="confirmPasswordRegister" placeholder="Confirm Password">
-                        </div><!-- /.passwordRegisterGroup -->
-                        <div class="checkbox register">
-                            <label for="publicScoresRegister">Post my scores to the public scoreboard</label>
-                            <input class="pull-right" type="checkbox" value="true" id="publicScoresRegister" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">
-                        </div><!-- /.checkbox -->
-                        <button id="registerButton"type="button" class="btn btn-info register" onclick="processRegistration();">Register</button>
+                        <form id="registerForm" onsubmit="processRegistration(); return false;">
+                            <div id="firstNameRegisterGroup" class="form-group">
+                                <input type="text" class="form-control text-center register" id="firstNameRegister" placeholder="First Name">
+                            </div><!-- /.firstNameRegisterGroup -->
+                            <div id="lastNameRegisterGroup" class="form-group">
+                                <input type="text" class="form-control text-center register" id="lastNameRegister" placeholder="Last Name">
+                            </div><!-- /.lastNameRegisterGroup -->
+                            <div id="emailRegisterGroup" class="form-group">
+                                <!-- I have opted to use a text input over an email input, to allow me to implement my own email validation -->
+                                <input type="text" class="form-control text-center register" id="emailRegister" placeholder="Email Address">
+                            </div><!-- /.emailRegisterGroup -->
+                            <div id="passwordRegisterGroup" class="form-group">
+                                <input type="password" class="form-control text-center register" id="passwordRegister" placeholder="Password">
+                                <input type="password" class="form-control text-center register" id="confirmPasswordRegister" placeholder="Confirm Password">
+                            </div><!-- /.passwordRegisterGroup -->
+                            <div class="checkbox register">
+                                <label for="publicScoresRegister">Post my scores to the public scoreboard</label>
+                                <input class="pull-right" type="checkbox" value="true" id="publicScoresRegister" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">
+                            </div><!-- /.checkbox -->
+                            <button id="registerButton"type="submit" class="btn btn-info register">Register</button>
+                        </form>
                     </div><!-- /.modal-body -->
                     <div class="modal-footer">
                         <p class="help-block">Already have an account? <a id="registerToSignIn" href="#" data-dismiss="modal">Sign in!</a></p>
@@ -108,7 +112,7 @@
                                     <th>Score</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="scoresTableBody">
                             </tbody>
                         </table>
                     </div><!-- /.modal-body -->
@@ -127,32 +131,34 @@
                     </div><!-- /.modal-header -->
                     <div class="modal-body">
                         <div id="settingsAlert"></div>
-                        <div id="firstNameSettingsGroup" class="form-group">
-                            <input type="text" class="form-control text-center settings" id="firstNameSettings" placeholder="First Name">
-                        </div><!-- /.firstNameSettingsGroup -->
-                        <div id="lastNameSettingsGroup" class="form-group">
-                            <input type="text" class="form-control text-center settings" id="lastNameSettings" placeholder="Last Name">
-                        </div><!-- /.lastNameSettingsGroup -->
-                        <div id="emailSettingsGroup" class="form-group">
-                            <!-- I have opted to use a text input over an email input, to allow me to implement my own email validation -->
-                            <input type="email" class="form-control text-center settings" id="emailSettings" placeholder="Email Address">
-                        </div><!-- /.emailSettingsGroup -->
-                        <div id="passwordSettingsGroup" class="form-group">
-                            <input type="password" class="form-control text-center settings" id="passwordSettings" placeholder="Password">
-                            <input type="password" class="form-control text-center settings" id="confirmPasswordSettings" placeholder="Confirm Password">
-                        </div><!-- /.passwordSettingsGroup -->
-                        <div class="settingsButtons">
-                            <button data-toggle="modal" data-target="#deleteScoresModal" id="clearScoresSettingsButton" type="button" class="btn btn-danger settings">Clear My Scores</button>
-                            <button data-toggle="modal" data-target="#deleteAccountModal" id="deleteAccountSettingsButton" type="button" class="btn btn-danger settings">Delete My Account</button>
-                        </div><!-- /.settingsButtons -->
-                        <div class="checkbox settings">
-                            <label for="publicScoresSettings">Post my scores to the public scoreboard</label>
-                            <input class="pull-right" type="checkbox" value="true" id="publicScoresSettings" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">
-                        </div><!-- /.checkbox -->
-                        <div class="settingsButtons">
-                            <button id="saveSettingsButton" type="button" class="btn btn-success inlineSettings settings" onclick="processSettings();">Save</button>
-                            <button id="cancelSettingsButton" type="button" class="btn btn-danger inlineSettings settings" data-dismiss="modal" onclick="resetSettings();">Cancel</button>
-                        </div><!-- /.settingsButtons -->
+                        <form id="settingsForm" onsubmit="processSettings(); return false;">
+                            <div id="firstNameSettingsGroup" class="form-group">
+                                <input type="text" class="form-control text-center settings" id="firstNameSettings" placeholder="First Name">
+                            </div><!-- /.firstNameSettingsGroup -->
+                            <div id="lastNameSettingsGroup" class="form-group">
+                                <input type="text" class="form-control text-center settings" id="lastNameSettings" placeholder="Last Name">
+                            </div><!-- /.lastNameSettingsGroup -->
+                            <div id="emailSettingsGroup" class="form-group">
+                                <!-- I have opted to use a text input over an email input, to allow me to implement my own email validation -->
+                                <input type="email" class="form-control text-center settings" id="emailSettings" placeholder="Email Address">
+                            </div><!-- /.emailSettingsGroup -->
+                            <div id="passwordSettingsGroup" class="form-group">
+                                <input type="password" class="form-control text-center settings" id="passwordSettings" placeholder="Password">
+                                <input type="password" class="form-control text-center settings" id="confirmPasswordSettings" placeholder="Confirm Password">
+                            </div><!-- /.passwordSettingsGroup -->
+                            <div class="settingsButtons">
+                                <button data-toggle="modal" data-target="#deleteScoresModal" id="clearScoresSettingsButton" type="button" class="btn btn-danger settings">Clear My Scores</button>
+                                <button data-toggle="modal" data-target="#deleteAccountModal" id="deleteAccountSettingsButton" type="button" class="btn btn-danger settings">Delete My Account</button>
+                            </div><!-- /.settingsButtons -->
+                            <div class="checkbox settings">
+                                <label for="publicScoresSettings">Post my scores to the public scoreboard</label>
+                                <input class="pull-right" type="checkbox" value="true" id="publicScoresSettings" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">
+                            </div><!-- /.checkbox -->
+                            <div class="settingsButtons">
+                                <button id="saveSettingsButton" type="submit" class="btn btn-success inlineSettings settings">Save</button>
+                                <button id="cancelSettingsButton" type="button" class="btn btn-danger inlineSettings settings" data-dismiss="modal" onclick="resetSettings();">Cancel</button>
+                            </div><!-- /.settingsButtons -->
+                        </form>
                     </div><!-- /.modal-body -->
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
