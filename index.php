@@ -22,6 +22,8 @@
         <script src='js/jquery.md5.js'></script> 
         <!-- Import the Website logic (THE CODE IN THIS FILE IS MY CODE!) -->
         <script src='js/website.js'></script> 
+        <!-- Import the game (THE CODE IN THIS FILE IS MY CODE!) -->
+        <script src='js/game.js'></script> 
     </head>
     <body>
         <!-- Display the navbar/header from the base file -->
@@ -29,6 +31,10 @@
 
         <!-- Placeholder that is used when an alert is created -->
         <div id = "mainAlert"></div>
+        <div class="container">
+            <canvas id="mainCanvas" class="center-block" width="500" height="500"></canvas>
+        </div>
+
 
         <!-- Modal displayed for the user to sign in -->
         <div id="signInModal" class="modal fade" data-keyboard="false">

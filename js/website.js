@@ -521,4 +521,25 @@ $( document ).ready(function() {
     $("#publicScoresRegister").bootstrapSwitch();
     $("#publicScoresSettings").bootstrapSwitch();
 
+    initGame();
+
+
+});
+
+// Detect Key Presses
+$( document ).keydown(function(event) {
+    switch (event.which) {
+        case 37: 
+            console.log("Left Arrow");
+            break;
+        case 38: 
+            console.log("Up Arrow");
+            break;
+        case 39: 
+            console.log("Right Arrow");
+            break;
+        case 40: 
+            console.log("Down Arrow");
+            break;
+    }
 });
