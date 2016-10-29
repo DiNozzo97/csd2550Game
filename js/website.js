@@ -26,14 +26,15 @@ function processRegistration() {
     // Reset any previous validation attempts
     $(".has-error").removeClass("has-error");
     $(".has-success").removeClass("has-success");
+    // Declaring some variables that can help keep track of the validation progress
     var validationPassed = true,
         totalErrors = [],
         invalidNames = [],
         duplicateEmail = false,
-        existingUsers = JSON.parse(localStorage.users),
+        existingUsers = JSON.parse(localStorage.users), // Convert the users JSON string in to a JS object so that it can be searched for duplicate users
         lwrEmailAddress = $('#emailRegister').val().toLowerCase(), // Make the email address lowercase, so that it can be used to check for existing records
         emptyFields = [];
-    // Check to see that all of the fields have been filled in
+    // check to see whether each field has been left empty, if so, make the input glow red (class has-error), add it to the emptyFields array and the totalErrors array (used to check at the end which fields have failed validation)
     if ($('#firstNameRegister').val() == '') {
         $("#firstNameRegisterGroup").addClass("has-error");
         emptyFields.push("First Name");
@@ -59,7 +60,7 @@ function processRegistration() {
         validationPassed = false;
     }
 
-    // Validate the firstName/lastName/email
+    // check to see whether the firstName/lastName/email inputs match a regex expression to check data validity, if not, make the input glow red (class has-error), add it to the invalidNames array and the totalErrors array (used to check at the end which fields have failed validation)
     if (!(/^[-'a-zA-Z ]*$/.test($('#firstNameRegister').val()))) {
         $("#firstNameRegisterGroup").addClass("has-error");
         invalidNames.push("First Name");
@@ -78,19 +79,20 @@ function processRegistration() {
         totalErrors.push("#emailRegisterGroup");
         validationPassed = false;
     }
-    // See if the email address already exists 
+    // See if the email address is already registered (by searching through each existing users email address)
     for (i = 0; i < existingUsers.length; i += 1) {
         if (existingUsers[i].emailAddress == lwrEmailAddress) {
             duplicateEmail = true;
             validationPassed = false;
         }
+        // if it is then, make the input glow red (class has-error) and add it to the totalErrors array (used to check at the end which fields have failed validation)
         if (duplicateEmail == true) {
             $( "#emailRegisterGroup" ).addClass( "has-error" );
             totalErrors.push("#emailRegisterGroup");
         }
     }
 
-    // Validate that the 2 passwords entered match (I am currently not enforcing any password rules other than NOT empty!)
+    // Validate that the 2 passwords entered match (I am currently not enforcing any password rules other than NOT empty!), if not, make the input glow red (class has-error), add it to the totalErrors array (used to check at the end which fields have failed validation)
     var passwordsMatch = true;
     if ($('#passwordRegister').val() != $('#confirmPasswordRegister').val()) {
         $( "#passwordRegisterGroup" ).addClass( "has-error" );
@@ -101,16 +103,20 @@ function processRegistration() {
 
     // Finally, if there has been an error, display a message, otherwise generate a Salt and a hash and then add the user.
     if (validationPassed) {
-        // Generate a 4 CHAR SALT
+        // Generate a 4 CHAR random SALT
         var salt = "";
         var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@£$%";
         for( i=0; i < 4; i++ )
             salt += charset.charAt(Math.floor(Math.random() * charset.length));
+        // add the user and hash the password + SALT in the process
         addUser($('#firstNameRegister').val(), $('#lastNameRegister').val(), lwrEmailAddress, salt, $.md5(salt + $('#passwordRegister').val()), $("#publicScoresRegister").is(':checked'));
+        // Hide the sign up modal
         $('#registerModal').modal('hide');
+        // Display an alert on the login screen to the user
         alertActivator("signIn", "success", "You have successfully registered your account, sign in below:", true)
+        // Clear the form, incase another user wants to sign up without refreshing the page
         $("#registerForm").trigger('reset');
-    } else { // If Validation failed
+    } else { // If Validation failed, check the status of the various validation checks and display the relevant errors (with correct grammer)
         var errorMessage = "";
         if (emptyFields.length > 0) {
             errorMessage += "Please complete the ";
@@ -143,7 +149,7 @@ function processRegistration() {
         // Create alert for the user
         alertActivator("register", "danger", errorMessage, false);
 
-        // Make all valid inputs green
+        // Make all valid inputs (inputs that aren't in the totalError array) green (class has-success)
         var allInputGroups = ["#firstNameRegisterGroup", "#lastNameRegisterGroup", "#emailRegisterGroup", "#passwordRegisterGroup"];
         $.each(allInputGroups, function(index, value) {
             if ($.inArray(value, totalErrors) == -1) {
@@ -159,14 +165,15 @@ function processSettings() {
     // Reset any previous validation attempts
     $(".has-error").removeClass("has-error");
     $(".has-success").removeClass("has-success");
+    // Declaring some variables that can help keep track of the validation progress
     var validationPassed = true,
         totalErrors = [],
         invalidNames = [],
         duplicateEmail = false,
-        existingUsers = JSON.parse(localStorage.users),
+        existingUsers = JSON.parse(localStorage.users), // Convert the users JSON string in to a JS object so that it can be searched for duplicate users
         lwrEmailAddress = $('#emailSettings').val().toLowerCase(), // Make the email address lowercase, so that it can be used to check for existing records
         emptyFields = [];
-    // Check to see that all of the fields have been filled in
+    // check to see whether each field has been left empty, if so, make the input glow red (class has-error), add it to the emptyFields array and the totalErrors array (used to check at the end which fields have failed validation)
     if ($('#firstNameSettings').val() == '') {
         $("#firstNameSettingsGroup").addClass("has-error");
         emptyFields.push("First Name");
@@ -186,7 +193,7 @@ function processSettings() {
         validationPassed = false;
     }
 
-    // Validate the firstName/lastName/email
+    // check to see whether the firstName/lastName/email inputs match a regex expression to check data validity, if not, make the input glow red (class has-error), add it to the invalidNames array and the totalErrors array (used to check at the end which fields have failed validation)
     if (!(/^[-'a-zA-Z ]*$/.test($('#firstNameSettings').val()))) {
         $("#firstNameSettingsGroup").addClass("has-error");
         invalidNames.push("First Name");
@@ -205,19 +212,20 @@ function processSettings() {
         totalErrors.push("#emailSettingsGroup");
         validationPassed = false;
     }
-    // See if the email address already exists 
+    // See if the email address is already registered (by searching through each existing users email address)
     for (i = 0; i < existingUsers.length; i += 1) {
         if ((existingUsers[i].emailAddress == lwrEmailAddress) && (sessionStorage.currentEmail != lwrEmailAddress)) {
             duplicateEmail = true;
             validationPassed = false;
         }
+        // if it is then, make the input glow red (class has-error) and add it to the totalErrors array (used to check at the end which fields have failed validation)
         if (duplicateEmail == true) {
             $( "#emailSettingsGroup" ).addClass( "has-error" );
             totalErrors.push("#emailSettingsGroup");
         }
     }
 
-    // Validate that the 2 passwords entered match (I am currently not enforcing any password rules other than NOT empty!)
+    // Validate that the 2 passwords entered match (I am currently not enforcing any password rules other than NOT empty!), if not, make the input glow red (class has-error), add it to the totalErrors array (used to check at the end which fields have failed validation)
     var passwordsMatch = true;
     if ($('#passwordSettings').val() != $('#confirmPasswordSettings').val()) {
         $( "#passwordSettingsGroup" ).addClass( "has-error" );
@@ -231,6 +239,7 @@ function processSettings() {
         var passwordHash,
             salt;
 
+        // I have allowed the facility for the password field to be left empty, in order to keep the existing password. This therefore fetches the existing password if it is left blank, otherwise it will take the users input and update the password.
         if ($('#passwordSettings').val() == '') {
             passwordHash = existingUsers[sessionStorage.currentArrayPosition].passwordHash;
             salt = existingUsers[sessionStorage.currentArrayPosition].passwordSalt;
@@ -243,13 +252,18 @@ function processSettings() {
                 salt += charset.charAt(Math.floor(Math.random() * charset.length));
             passwordHash = $.md5(salt + $('#passwordSettings').val());
         }
+        // now update the user
         editUser($('#firstNameSettings').val(), $('#lastNameSettings').val(), $('#emailSettings').val(), salt, passwordHash, $("#publicScoresSettings").is(':checked'));
 
+        // Hide the settings modal
         $('#settingsModal').modal('hide');
+        // clear any validation alerts in settings
         $('.alert.settings').hide();
+        // reload the new settings in to the form in case the user wants to make any more adjustments
         resetSettings();
+        // Alert the user that their new settings have saved
         alertActivator("main", "success", "New settings saved!", true)
-    } else { // If Validation failed
+    } else { // If Validation failed, check the status of the various validation checks and display the relevant errors (with correct grammer)
         var errorMessage = "";
         if (emptyFields.length > 0) {
             errorMessage += "Please complete the ";
@@ -274,7 +288,7 @@ function processSettings() {
             errorMessage += " field(s) are invalid. <br>";
         }
         if (duplicateEmail == true) {
-            errorMessage += "There is already a user Settingsed with this email address. <br>";
+            errorMessage += "There is already a user registered with this email address. <br>";
         }
         if (passwordsMatch != true) {
             errorMessage += "The passwords you have entered do not match. Please try again.";
@@ -282,7 +296,7 @@ function processSettings() {
         // Create alert for the user
         alertActivator("settings", "danger", errorMessage, false);
 
-        // Make all valid inputs green
+        // Make all valid inputs (inputs that aren't in the totalError array) green (class has-success)
         var allInputGroups = ["#firstNameSettingsGroup", "#lastNameSettingsGroup", "#emailSettingsGroup", "#passwordSettingsGroup"];
         $.each(allInputGroups, function(index, value) {
             if ($.inArray(value, totalErrors) == -1) {
@@ -293,16 +307,20 @@ function processSettings() {
     }
 }
 
+// The function editUser will update the users details in Local Storage
 function editUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
-    var usersObj = JSON.parse(localStorage.users),
-        arrayPos = sessionStorage.currentArrayPosition;
+    var usersObj = JSON.parse(localStorage.users), // convert the JSON string in to a JS object
+        arrayPos = sessionStorage.currentArrayPosition; // get the array position of the user to update from Session Storage
+    // Update the details in the object
     usersObj[arrayPos].firstName = firstName;
     usersObj[arrayPos].lastName = lastName;
     usersObj[arrayPos].emailAddress = emailAdr;
     usersObj[arrayPos].passwordSalt = pwdSalt;
     usersObj[arrayPos].passwordHash = pwdHash;
     usersObj[arrayPos].saveScore = postScores;
-    localStorage.users = JSON.stringify(usersObj);
+
+    localStorage.users = JSON.stringify(usersObj); // Convert the Object back in to a JSON string and save it back in localstorage
+    // Update the session storage with the new data
     sessionStorage.currentEmail = emailAdr;
     sessionStorage.currentFirstName = firstName;
     sessionStorage.currentLastName = lastName;
@@ -310,7 +328,7 @@ function editUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
     checkLoginStatus(); //To update the name in navBar if required
 }
 
-// The function resetSettings will initialise the settings data in the input boxs
+// The function resetSettings will initialise the settings data in the settings input boxes
 function resetSettings() {
     $('#firstNameSettings').val(sessionStorage.currentFirstName);
     $('#lastNameSettings').val(sessionStorage.currentLastName);
@@ -329,11 +347,11 @@ function processSignIn() {
     $(".has-error").removeClass("has-error");
     $(".has-success").removeClass("has-success");
     var userAuthenticated = false,
-        existingUsers = JSON.parse(localStorage.users);
-    // Get the value of email address and find it in the user array
-    for (i = 0; i < existingUsers.length; i += 1) {
-        if (existingUsers[i].emailAddress == $('#emailSignIn').val().toLowerCase()) {
-            if (existingUsers[i].passwordHash == ($.md5(existingUsers[i].passwordSalt + $('#passwordSignIn').val()))) {
+        existingUsers = JSON.parse(localStorage.users); // convert the JSON users into a JS object
+    for (i = 0; i < existingUsers.length; i += 1) { // Get the value of email address and find it in the user array
+        if (existingUsers[i].emailAddress == $('#emailSignIn').val().toLowerCase()) { // if the email address is found
+            if (existingUsers[i].passwordHash == ($.md5(existingUsers[i].passwordSalt + $('#passwordSignIn').val()))) { // and the password matches
+                // set session storage data
                 sessionStorage.signedIn = true;
                 sessionStorage.currentArrayPosition = i;
                 sessionStorage.currentEmail = existingUsers[i].emailAddress;
@@ -342,18 +360,24 @@ function processSignIn() {
                 sessionStorage.currentLastName = existingUsers[i].lastName;
                 sessionStorage.currentPostToScores = existingUsers[i].saveScore;
                 sessionStorage.highScore = existingUsers[i].highScore;
-                checkLoginStatus();
+                checkLoginStatus(); // update the nav bar to the signed in version
+                // let the user know they are signed in
                 alertActivator("main", "success", "You have successfuly signed in.", true);
+                // Hide the sign in modal
                 $('#signInModal').modal('hide');
+                // set user as authenticated (local variable so that it skips producing login error)
                 userAuthenticated = true;
+                // Clear the inputs for the next user
                 $("#signInForm").trigger('reset');
+                // update the settings fields with the signed in users details, ready for editing.
                 resetSettings();
             }
         }
     }
-    if (userAuthenticated == false) {
-        $("#signInGroup").addClass("has-error");
-        alertActivator("signIn", "danger", "Incorrect email/password combination", false);
+    
+    if (userAuthenticated == false) { // if the user didn't enter a matching email/password
+        $("#signInGroup").addClass("has-error"); // make the inputs glow red
+        alertActivator("signIn", "danger", "Incorrect email/password combination", false); // alert the user that they didn't enter the correct credentials (not too specific for security reasons)
     }
 
 }
@@ -423,42 +447,50 @@ function saveScore(score) {
 
 // The deleteCurrentUser function will delete a user from local storage
 function deleteCurrentUser() {
-    var usersObj = JSON.parse(localStorage.users);
-    usersObj.splice(sessionStorage.currentArrayPosition, 1);
-    localStorage.users = JSON.stringify(usersObj);
-    deleteScores();
-    resetSessionStorage();
-    checkLoginStatus();
+    var usersObj = JSON.parse(localStorage.users); // parse existing JSON array into an object
+    usersObj.splice(sessionStorage.currentArrayPosition, 1); //delete the user from the array
+    localStorage.users = JSON.stringify(usersObj); // update the Local Storage JSON data
+    deleteScores(); // Delete the deled users scores
+    resetSessionStorage(); // Clear session storage
+    checkLoginStatus(); // update the Nav bar back to the guest version
+    // Hide all of the modals
     $('.modal').modal('hide');
+    // Alert the user
     alertActivator("main", "danger", "Your account has been deleted", true);
 }
 
 // The deleteScores function will delete the currently signed in users scores from the scoreboard
 function deleteScores() {
-    var existingScoresObj = JSON.parse(localStorage.scores),
+    var existingScoresObj = JSON.parse(localStorage.scores), // Parse the scores into a JS object
         newScoresObj = [];
 
-
+    // Find the scores that don't belong to the deleted user and copy them into a new object
     for (i = 0; i < existingScoresObj.length; i++ ) {
         if (existingScoresObj[i].userId != sessionStorage.currentId) {
             newScoresObj.push(existingScoresObj[i]);
         }
     }
-
+    
+    // update local storage with the new object
     localStorage.scores = JSON.stringify(newScoresObj);
+    // hide the delete scores modal
     $('#deleteScoresModal').modal('hide');
+    // alert the user
     alertActivator("settings", "success", "Scores Deleted!", true);
 
 }
 
 // The displayScores function will sort and display the scores on the 'Scores' modal
 function displayScores() {
-    var scoresObj = JSON.parse(localStorage.scores),
+    var scoresObj = JSON.parse(localStorage.scores), // Parse the scores into a JS object
         counter = 0;
-    scoresObj.sort(function(no1, no2){
+    // Sort the scores in decending order
+    scoresObj.sort(function(no1, no2){ 
         return no2.score - no1.score
     });
+    // clear any data currently displayed on the scoreboard
     $("#scoresTableBody").empty();
+    // Add the top 10 scores to the score board
     $.each(scoresObj, function( index, value ) {
         if (counter < 10) {
             $("#scoresTableBody").append("<tr><td>"+value.name+"</td><td>"+value.score+"</td></tr>");
@@ -520,26 +552,9 @@ $( document ).ready(function() {
     // Make the checkboxs into switches switch
     $("#publicScoresRegister").bootstrapSwitch();
     $("#publicScoresSettings").bootstrapSwitch();
-
+    
+    // Initiste the game
     initGame();
 
 
-});
-
-// Detect Key Presses
-$( document ).keydown(function(event) {
-    switch (event.which) {
-        case 37: 
-            console.log("Left Arrow");
-            break;
-        case 38: 
-            console.log("Up Arrow");
-            break;
-        case 39: 
-            console.log("Right Arrow");
-            break;
-        case 40: 
-            console.log("Down Arrow");
-            break;
-    }
 });

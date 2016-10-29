@@ -26,3 +26,33 @@ Sample Score Object:
         name: "Timbo Cole",
         score: 50,
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
