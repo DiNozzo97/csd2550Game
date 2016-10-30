@@ -32,7 +32,7 @@
         <!-- Placeholder that is used when an alert is created -->
         <div id = "mainAlert"></div>
         <div class="container">
-            <canvas id="mainCanvas" class="center-block" width="500" height="500"></canvas>
+            <canvas id="mainCanvas" class="center-block" width="500" height="520"></canvas>
         </div>
 
 

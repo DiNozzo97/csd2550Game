@@ -20,7 +20,13 @@ $( document ).keydown(function(event) {
 var canvas,
     ctx,
     blockWidth,
-    blockHeight;
+    blockHeight,
+    xPosition,
+    yPosition,
+    rotation,
+    pieceArray,
+    nextPiece,
+    gameBoard;
 
 
 function initGame() {
@@ -28,7 +34,15 @@ function initGame() {
     ctx = canvas.getContext("2d");
     drawGameArea();
     drawTopData();
+    // Create an array to represent the game board
+    gameBoard = new Array()
+    for (r=0; r<20; r++) {
+        gameBoard[r] = new Array(14);
+        for (c=0; c<14; c++) {
+            gameBoard[r][c] = 0;
 
+        }
+    }
 }
 
 function drawGameArea() {
@@ -37,17 +51,17 @@ function drawGameArea() {
     // Draw area next piece panel
     ctx.fillRect(0, 20, 150, 150);
     // Draw Main game area
-    ctx.fillRect(150, 20, 400, 480);
+    ctx.fillRect(150, 20, 400, 500);
     // Draw Main game area vertical grid
     for (i=150; i<550; i+=25) {
         ctx.beginPath();
         ctx.moveTo(i,20);
-        ctx.lineTo(i,500);
+        ctx.lineTo(i,520);
         ctx.stroke();
     }
 
     // Draw Main game area horizontal grid
-    for (i=20; i<500; i+=25) {
+    for (i=20; i<520; i+=25) {
         ctx.beginPath();
         ctx.moveTo(150,i);
         ctx.lineTo(550,i);
@@ -63,49 +77,63 @@ function drawTopData(){
     ctx.fillText("Name: "+sessionStorage.currentFirstName+" "+sessionStorage.currentLastName+"  Your High Score: "+sessionStorage.highScore,5,15);
 }
 
-function drawIBlock(rotation, xPosition, yPosition) {
+function drawIBlock() {
     if (rotation == 4)
         rotation = 0;
-    ctx.fillStyle = "#00FFFF";
     switch (rotation) {
         case 0:
         case 2:
             blockWidth = 25;
             blockHeight = 100;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 50, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 75, 25, 25);
+            pieceArray = 
+                [   
+                [1, 0, 0, 0],
+                [1, 0, 0, 0],
+                [1, 0, 0, 0],
+                [1, 0, 0, 0]
+            ];
             break;
         case 1:
         case 3:
             blockWidth = 100;
             blockHeight = 25;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 50, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 75, yPosition, 25, 25);
+            pieceArray = 
+                [   
+                [1, 1, 1, 1],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
     } 
+    copyPieceToBoard();
+    drawTetrominosOnBoard();
 }
 
-function drawOBlock(rotation, xPosition, yPosition) {
-    if (rotation == 1)
+function drawOBlock() {
+    if (rotation == 4)
         rotation = 0;
-    ctx.fillStyle = "#FFFF00";
     switch (rotation) {
         case 0 :
+        case 1 :
+        case 2 :
+        case 3 :
             blockWidth = 50;
             blockHeight = 50;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
+            pieceArray = 
+                [   
+                [2, 2, 0, 0],
+                [2, 2, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
     } 
+    copyPieceToBoard();
+    drawTetrominosOnBoard();
 }
 
-function drawLBlock(rotation, xPosition, yPosition) {
+function drawLBlock() {
     if (rotation == 4)
         rotation = 0;
     ctx.fillStyle = "#FFA500";
@@ -113,39 +141,53 @@ function drawLBlock(rotation, xPosition, yPosition) {
         case 0 :
             blockWidth = 50;
             blockHeight = 75;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 50, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 50, 25, 25);
+            pieceArray = 
+                [   
+                [3, 0, 0, 0],
+                [3, 0, 0, 0],
+                [3, 3, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
         case 1 :
             blockWidth = 75;
             blockHeight = 50;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 50, yPosition, 25, 25);
+            pieceArray = 
+                [   
+                [3, 3, 3, 0],
+                [3, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
         case 2 :
             blockWidth = 50;
             blockHeight = 75;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 50, 25, 25);
+            pieceArray = 
+                [   
+                [3, 3, 0, 0],
+                [0, 3, 0, 0],
+                [0, 3, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
         case 3 :
             blockWidth = 75;
             blockHeight = 50;
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 50, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 50, yPosition, 25, 25);
+            pieceArray = 
+                [   
+                [0, 0, 3, 0],
+                [3, 3, 3, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
     }
+    copyPieceToBoard();
+    drawTetrominosOnBoard();
 }
 
-function drawJBlock(rotation, xPosition, yPosition) {
+function drawJBlock() {
     if (rotation == 4)
         rotation = 0;
     ctx.fillStyle = "#0000FF";
@@ -153,39 +195,53 @@ function drawJBlock(rotation, xPosition, yPosition) {
         case 0 :
             blockWidth = 50;
             blockHeight = 75;
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 50, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 50, 25, 25);
+            pieceArray = 
+                [   
+                [0, 4, 0, 0],
+                [0, 4, 0, 0],
+                [4, 4, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
         case 1 :
             blockWidth = 75;
             blockHeight = 50;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 50, yPosition + 25, 25, 25);
+            pieceArray = 
+                [   
+                [4, 0, 0, 0],
+                [4, 4, 4, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
         case 2 :
             blockWidth = 50;
             blockHeight = 75;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 50, 25, 25);
+            pieceArray = 
+                [   
+                [4, 4, 0, 0],
+                [4, 0, 0, 0],
+                [4, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
         case 3 :
             blockWidth = 75;
             blockHeight = 50;
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 50, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 50, yPosition + 25, 25, 25);
+            pieceArray = 
+                [   
+                [4, 4, 4, 0],
+                [0, 0, 4, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
     }
+    copyPieceToBoard();
+    drawTetrominosOnBoard();
 }
 
-function drawSBlock(rotation, xPosition, yPosition) {
+function drawSBlock() {
     if (rotation == 4)
         rotation = 0;
     ctx.fillStyle = "#00FF00";
@@ -194,24 +250,32 @@ function drawSBlock(rotation, xPosition, yPosition) {
         case 2 :
             blockWidth  = 75;
             blockHeight = 50;
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 50, yPosition, 25, 25);
+            pieceArray = 
+                [   
+                [0, 5, 5, 0],
+                [5, 5, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
         case 1 :
         case 3 :
             blockWidth = 50;
             blockHeight = 75;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 50, 25, 25);
+            pieceArray = 
+                [   
+                [5, 0, 0, 0],
+                [5, 5, 0, 0],
+                [0, 5, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
     }
+    copyPieceToBoard();
+    drawTetrominosOnBoard();
 }
 
-function drawZBlock(rotation, xPosition, yPosition) {
+function drawZBlock() {
     if (rotation == 4)
         rotation = 0;
     ctx.fillStyle = "#ff0000";
@@ -220,24 +284,32 @@ function drawZBlock(rotation, xPosition, yPosition) {
         case 2 :
             blockWidth  = 75;
             blockHeight = 50;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 50, yPosition + 25, 25, 25);
+            pieceArray = 
+                [   
+                [6, 6, 0, 0],
+                [0, 6, 6, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
         case 1 :
         case 3 :
             blockWidth = 50;
             blockHeight = 75;
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 50, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
+            pieceArray = 
+                [   
+                [0, 6, 0, 0],
+                [6, 6, 0, 0],
+                [6, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
     }
+    copyPieceToBoard();
+    drawTetrominosOnBoard();
 }
 
-function drawTBlock(rotation, xPosition, yPosition) {
+function drawTBlock() {
     if (rotation == 4)
         rotation = 0;
     ctx.fillStyle = "#b600b6";
@@ -245,34 +317,104 @@ function drawTBlock(rotation, xPosition, yPosition) {
         case 0 :
             blockWidth  = 75;
             blockHeight = 50;
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 50, yPosition + 25, 25, 25);
+            pieceArray = 
+                [   
+                [0, 7, 0, 0],
+                [7, 7, 7, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
         case 1 :
             blockWidth  = 50;
             blockHeight = 75;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition, yPosition + 50, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
+            pieceArray = 
+                [   
+                [7, 0, 0, 0],
+                [7, 7, 0, 0],
+                [7, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
         case 2 :
             blockWidth  = 75;
             blockHeight = 50;
-            ctx.fillRect(xPosition, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 50, yPosition, 25, 25);
+            pieceArray = 
+                [   
+                [7, 7, 7, 0],
+                [0, 7, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
         case 3 :
             blockWidth  = 50;
             blockHeight = 75;
-            ctx.fillRect(xPosition, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 25, 25, 25);
-            ctx.fillRect(xPosition + 25, yPosition + 50, 25, 25);
+            pieceArray = 
+                [   
+                [0, 7, 0, 0],
+                [7, 7, 0, 0],
+                [0, 7, 0, 0],
+                [0, 0, 0, 0]
+            ];
             break;
     }
+    copyPieceToBoard();
+    drawTetrominosOnBoard();
 }
+
+function xGridRefToCoordinate (xGridRef) {
+    xCoordinate = 150 + (xGridRef * 25);
+    return xCoordinate;
+}
+
+function yGridRefToCoordinate (yGridRef) {
+    yCoordinate = 20 + (yGridRef * 25);
+    return yCoordinate;
+}
+
+function copyPieceToBoard(){
+    for (i=0; i<4; i++){
+        for (j=0; j<4; j++) {
+            if (pieceArray[i][j] != 0)
+                gameBoard[yPosition+i][xPosition+j] = pieceArray[i][j];
+
+        }
+    }
+}
+
+function drawTetrominosOnBoard() {
+    for (i=0; i<20; i++){
+        for (j=0; j<14; j++) {
+            if (gameBoard[i][j] != 0) {
+                switch (gameBoard[i][j]){
+                    case 1: // Cyan (I Block)
+                        ctx.fillStyle = "#00FFFF";
+                        break;
+                    case 2: // Yellow (O Block)
+                        ctx.fillStyle = "#FFFF00";
+                        break;
+                    case 3: // Orange (L Block)
+                        ctx.fillStyle = "#FFA500";
+                        break;
+                    case 4: // Blue (J Block)
+                        ctx.fillStyle = "#0000FF";
+                        break;
+                    case 5: // Green (S Block)
+                        ctx.fillStyle = "#00FF00";
+                        break;
+                    case 6: // Red (Z Block)
+                        ctx.fillStyle = "#ff0000";
+                        break;
+                    case 7: // Pink (T Block)
+                        ctx.fillStyle = "#b600b6";
+                        break;
+
+                }
+                ctx.fillRect(xGridRefToCoordinate(j), yGridRefToCoordinate(i), 25, 25);
+            }
+        }
+    }
+}
+
+
