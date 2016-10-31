@@ -21,6 +21,8 @@ var canvas,
     ctx,
     blockWidth,
     blockHeight,
+    prevXPosition,
+    prevYPosition,
     xPosition,
     yPosition,
     rotation,
@@ -32,7 +34,6 @@ var canvas,
 function initGame() {
     canvas = document.getElementById("mainCanvas");
     ctx = canvas.getContext("2d");
-    drawGameArea();
     drawTopData();
     // Create an array to represent the game board
     gameBoard = new Array()
@@ -43,6 +44,7 @@ function initGame() {
 
         }
     }
+    drawGameArea();
 }
 
 function drawGameArea() {
@@ -67,6 +69,8 @@ function drawGameArea() {
         ctx.lineTo(550,i);
         ctx.stroke();
     }
+
+    drawTetrominosOnBoard();
 
 }
 
@@ -107,7 +111,7 @@ function drawIBlock() {
             break;
     } 
     copyPieceToBoard();
-    drawTetrominosOnBoard();
+//    drawTetrominosOnBoard();
 }
 
 function drawOBlock() {
@@ -130,13 +134,12 @@ function drawOBlock() {
             break;
     } 
     copyPieceToBoard();
-    drawTetrominosOnBoard();
+//    drawTetrominosOnBoard();
 }
 
 function drawLBlock() {
     if (rotation == 4)
         rotation = 0;
-    ctx.fillStyle = "#FFA500";
     switch (rotation) {
         case 0 :
             blockWidth = 50;
@@ -184,13 +187,12 @@ function drawLBlock() {
             break;
     }
     copyPieceToBoard();
-    drawTetrominosOnBoard();
+//    drawTetrominosOnBoard();
 }
 
 function drawJBlock() {
     if (rotation == 4)
         rotation = 0;
-    ctx.fillStyle = "#0000FF";
     switch (rotation) {
         case 0 :
             blockWidth = 50;
@@ -238,13 +240,12 @@ function drawJBlock() {
             break;
     }
     copyPieceToBoard();
-    drawTetrominosOnBoard();
+//    drawTetrominosOnBoard();
 }
 
 function drawSBlock() {
     if (rotation == 4)
         rotation = 0;
-    ctx.fillStyle = "#00FF00";
     switch (rotation) {
         case 0 :
         case 2 :
@@ -272,13 +273,12 @@ function drawSBlock() {
             break;
     }
     copyPieceToBoard();
-    drawTetrominosOnBoard();
+//    drawTetrominosOnBoard();
 }
 
 function drawZBlock() {
     if (rotation == 4)
         rotation = 0;
-    ctx.fillStyle = "#ff0000";
     switch (rotation) {
         case 0 :
         case 2 :
@@ -306,13 +306,12 @@ function drawZBlock() {
             break;
     }
     copyPieceToBoard();
-    drawTetrominosOnBoard();
+//    drawTetrominosOnBoard();
 }
 
 function drawTBlock() {
     if (rotation == 4)
         rotation = 0;
-    ctx.fillStyle = "#b600b6";
     switch (rotation) {
         case 0 :
             blockWidth  = 75;
@@ -360,7 +359,7 @@ function drawTBlock() {
             break;
     }
     copyPieceToBoard();
-    drawTetrominosOnBoard();
+//    drawTetrominosOnBoard();
 }
 
 function xGridRefToCoordinate (xGridRef) {
@@ -381,6 +380,8 @@ function copyPieceToBoard(){
 
         }
     }
+    prevXPosition = xPosition;
+    prevYPosition = yPosition;
 }
 
 function drawTetrominosOnBoard() {
@@ -409,12 +410,23 @@ function drawTetrominosOnBoard() {
                     case 7: // Pink (T Block)
                         ctx.fillStyle = "#b600b6";
                         break;
-
                 }
                 ctx.fillRect(xGridRefToCoordinate(j), yGridRefToCoordinate(i), 25, 25);
             }
         }
     }
+}
+
+function clearPiece() {
+    for (i=0; i<4; i++){
+        for (j=0; j<4; j++) {
+            if (pieceArray[i][j] != 0)
+                gameBoard[prevYPosition+i][prevXPosition+j] = 0;
+
+        }
+    }
+    ctx.clearRect(150, 20, 400, 500);
+    drawGameArea();
 }
 
 
