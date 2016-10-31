@@ -1,7 +1,13 @@
 TO DO:
 - Code prettying up
-- Make the game!
 
+WHEN MOVING A PIECE:
+- Set prevXPosition = xPosition
+- Set prevYPosition = YPosition
+- Set new xpostion and yPosition
+- clearPiece()
+- draw?Block
+- drawTetrominosOnBoard()
 
 
 

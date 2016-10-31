@@ -380,8 +380,6 @@ function copyPieceToBoard(){
 
         }
     }
-    prevXPosition = xPosition;
-    prevYPosition = yPosition;
 }
 
 function drawTetrominosOnBoard() {
