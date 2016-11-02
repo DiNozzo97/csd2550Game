@@ -37,9 +37,9 @@ function initGame() {
     drawTopData();
     // Create an array to represent the game board
     gameBoard = new Array()
-    for (r=0; r<20; r++) {
+    for (var r=0; r<20; r++) {
         gameBoard[r] = new Array(14);
-        for (c=0; c<14; c++) {
+        for (var c=0; c<14; c++) {
             gameBoard[r][c] = 0;
 
         }
@@ -55,7 +55,7 @@ function drawGameArea() {
     // Draw Main game area
     ctx.fillRect(150, 20, 400, 500);
     // Draw Main game area vertical grid
-    for (i=150; i<550; i+=25) {
+    for (var i=150; i<550; i+=25) {
         ctx.beginPath();
         ctx.moveTo(i,20);
         ctx.lineTo(i,520);
@@ -63,7 +63,7 @@ function drawGameArea() {
     }
 
     // Draw Main game area horizontal grid
-    for (i=20; i<520; i+=25) {
+    for (var i=20; i<520; i+=25) {
         ctx.beginPath();
         ctx.moveTo(150,i);
         ctx.lineTo(550,i);
@@ -78,7 +78,11 @@ function drawTopData(){
     ctx.clearRect(0, 0, canvas.width, 20);
     ctx.font="15px Arial";
     ctx.fillStyle = "rgb(0,0,0)";
-    ctx.fillText("Name: "+sessionStorage.currentFirstName+" "+sessionStorage.currentLastName+"  Your High Score: "+sessionStorage.highScore,5,15);
+    if (sessionStorage.signedIn == 'true')
+        ctx.fillText("Name: "+sessionStorage.currentFirstName+" "+sessionStorage.currentLastName+"  Your High Score: "+sessionStorage.highScore,5,15);
+    else
+        ctx.fillText("Name: Guest   Your High Score: Please Sign In to save your scores. ",5,15);
+
 }
 
 function drawIBlock() {
@@ -373,8 +377,8 @@ function yGridRefToCoordinate (yGridRef) {
 }
 
 function copyPieceToBoard(){
-    for (i=0; i<4; i++){
-        for (j=0; j<4; j++) {
+    for (var i=0; i<4; i++){
+        for (var j=0; j<4; j++) {
             if (pieceArray[i][j] != 0)
                 gameBoard[yPosition+i][xPosition+j] = pieceArray[i][j];
 
@@ -383,8 +387,8 @@ function copyPieceToBoard(){
 }
 
 function drawTetrominosOnBoard() {
-    for (i=0; i<20; i++){
-        for (j=0; j<14; j++) {
+    for (var i=0; i<20; i++){
+        for (var j=0; j<14; j++) {
             if (gameBoard[i][j] != 0) {
                 switch (gameBoard[i][j]){
                     case 1: // Cyan (I Block)
@@ -416,7 +420,7 @@ function drawTetrominosOnBoard() {
 }
 
 function clearPiece() {
-    for (i=0; i<4; i++){
+    for (var i=0; i<4; i++){
         for (j=0; j<4; j++) {
             if (pieceArray[i][j] != 0)
                 gameBoard[prevYPosition+i][prevXPosition+j] = 0;

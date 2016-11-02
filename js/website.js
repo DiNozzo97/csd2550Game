@@ -80,7 +80,7 @@ function processRegistration() {
         validationPassed = false;
     }
     // See if the email address is already registered (by searching through each existing users email address)
-    for (i = 0; i < existingUsers.length; i += 1) {
+    for (var i = 0; i < existingUsers.length; i += 1) {
         if (existingUsers[i].emailAddress == lwrEmailAddress) {
             duplicateEmail = true;
             validationPassed = false;
@@ -106,7 +106,7 @@ function processRegistration() {
         // Generate a 4 CHAR random SALT
         var salt = "";
         var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@£$%";
-        for( i=0; i < 4; i++ )
+        for(var i=0; i < 4; i++ )
             salt += charset.charAt(Math.floor(Math.random() * charset.length));
         // add the user and hash the password + SALT in the process
         addUser($('#firstNameRegister').val(), $('#lastNameRegister').val(), lwrEmailAddress, salt, $.md5(salt + $('#passwordRegister').val()), $("#publicScoresRegister").is(':checked'));
@@ -120,7 +120,7 @@ function processRegistration() {
         var errorMessage = "";
         if (emptyFields.length > 0) {
             errorMessage += "Please complete the ";
-            for (i=0;i < emptyFields.length; i++) {
+            for (var i=0;i < emptyFields.length; i++) {
                 errorMessage += emptyFields[i];
                 if (i < emptyFields.length - 2)
                     errorMessage += ", ";
@@ -131,7 +131,7 @@ function processRegistration() {
         }
         if (invalidNames.length > 0) {
             errorMessage += "The value you entered in the ";
-            for (i=0;i < invalidNames.length; i++) {
+            for (var i=0;i < invalidNames.length; i++) {
                 errorMessage += invalidNames[i];
                 if (i < invalidNames.length - 2)
                     errorMessage += ", ";
@@ -213,7 +213,7 @@ function processSettings() {
         validationPassed = false;
     }
     // See if the email address is already registered (by searching through each existing users email address)
-    for (i = 0; i < existingUsers.length; i += 1) {
+    for (var i = 0; i < existingUsers.length; i += 1) {
         if ((existingUsers[i].emailAddress == lwrEmailAddress) && (sessionStorage.currentEmail != lwrEmailAddress)) {
             duplicateEmail = true;
             validationPassed = false;
@@ -248,7 +248,7 @@ function processSettings() {
             // Generate a 4 CHAR SALT
             salt = "";
             var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@£$%";
-            for( i=0; i < 4; i++ )
+            for(var i=0; i < 4; i++ )
                 salt += charset.charAt(Math.floor(Math.random() * charset.length));
             passwordHash = $.md5(salt + $('#passwordSettings').val());
         }
@@ -267,7 +267,7 @@ function processSettings() {
         var errorMessage = "";
         if (emptyFields.length > 0) {
             errorMessage += "Please complete the ";
-            for (i=0;i < emptyFields.length; i++) {
+            for (var i=0;i < emptyFields.length; i++) {
                 errorMessage += emptyFields[i];
                 if (i < emptyFields.length - 2)
                     errorMessage += ", ";
@@ -278,7 +278,7 @@ function processSettings() {
         }
         if (invalidNames.length > 0) {
             errorMessage += "The value you entered in the ";
-            for (i=0;i < invalidNames.length; i++) {
+            for (var i=0;i < invalidNames.length; i++) {
                 errorMessage += invalidNames[i];
                 if (i < invalidNames.length - 2)
                     errorMessage += ", ";
@@ -348,7 +348,7 @@ function processSignIn() {
     $(".has-success").removeClass("has-success");
     var userAuthenticated = false,
         existingUsers = JSON.parse(localStorage.users); // convert the JSON users into a JS object
-    for (i = 0; i < existingUsers.length; i += 1) { // Get the value of email address and find it in the user array
+    for (var i = 0; i < existingUsers.length; i += 1) { // Get the value of email address and find it in the user array
         if (existingUsers[i].emailAddress == $('#emailSignIn').val().toLowerCase()) { // if the email address is found
             if (existingUsers[i].passwordHash == ($.md5(existingUsers[i].passwordSalt + $('#passwordSignIn').val()))) { // and the password matches
                 // set session storage data
@@ -465,7 +465,7 @@ function deleteScores() {
         newScoresObj = [];
 
     // Find the scores that don't belong to the deleted user and copy them into a new object
-    for (i = 0; i < existingScoresObj.length; i++ ) {
+    for (var i = 0; i < existingScoresObj.length; i++ ) {
         if (existingScoresObj[i].userId != sessionStorage.currentId) {
             newScoresObj.push(existingScoresObj[i]);
         }
