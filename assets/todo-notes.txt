@@ -1,5 +1,10 @@
 TO DO:
+- Implement Arrow controls
+- Implement Move checking functions
 - Code prettying up
+
+
+NOTES:
 
 WHEN MOVING A PIECE:
 - Set prevXPosition = xPosition
@@ -10,9 +15,6 @@ WHEN MOVING A PIECE:
 - drawTetrominosOnBoard()
 
 
-
-NOTES:
-
 Sample User Object:
 
 {
@@ -20,7 +22,7 @@ Sample User Object:
         lastName: "Cole",
         emailAddress: "timbo_cole@yahoo.co.uk",
         passwordSalt: "1234",
-        passwordHash: "d9ffaca46d5990ec39501bcdf22ee7a1",
+        passwordHash: "d9ffaca46d5990ec39501bcdssaee7a1",
         saveScore: true,
         highScore: 0,
     }

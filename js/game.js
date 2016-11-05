@@ -1,34 +1,54 @@
-// Detect Key Presses
-$( document ).keydown(function(event) {
-    switch (event.which) {
-        case 37: // Left Arrow Key
-            console.log("Left Arrow");
-            break;
-        case 38: // Up Arrow Key
-            console.log("Up Arrow");
-            break;
-        case 39: // Right Arrow Key
-            console.log("Right Arrow");
-            break;
-        case 40: // Down Arrow Key
-        case 32: // Space bar Key
-            console.log("Down Arrow Or SpaceBar");
-            break;
-    }
-});
-
 var canvas,
     ctx,
     blockWidth,
     blockHeight,
     prevXPosition,
     prevYPosition,
+    prevPieceArray,
+    prevRotation,
     xPosition,
     yPosition,
     rotation,
     pieceArray,
     nextPiece,
     gameBoard;
+
+// Detect Key Presses
+$( document ).keydown(function(event) {
+    switch (event.which) {
+        case 37: // Left Arrow Key
+            console.log("Left Arrow");
+            prevXPosition = xPosition;
+            prevYPosition = yPosition;
+            prevPieceArray = pieceArray;
+            prevRotation = rotation;
+            break;
+        case 38: // Up Arrow Key
+            console.log("Up Arrow");
+            prevXPosition = xPosition;
+            prevYPosition = yPosition;
+            prevPieceArray = pieceArray;
+            prevRotation = rotation;
+
+            break;
+        case 39: // Right Arrow Key
+            console.log("Right Arrow");
+            prevXPosition = xPosition;
+            prevYPosition = yPosition;
+            prevPieceArray = pieceArray;
+            prevRotation = rotation;
+
+            break;
+        case 40: // Down Arrow Key
+        case 32: // Space bar Key
+            console.log("Down Arrow Or SpaceBar");
+            prevXPosition = xPosition;
+            prevYPosition = yPosition;
+            prevPieceArray = pieceArray;
+            prevRotation = rotation;
+            break;
+    }
+});
 
 
 function initGame() {
@@ -45,6 +65,7 @@ function initGame() {
         }
     }
     drawGameArea();
+    testAnimate();
 }
 
 function drawGameArea() {
@@ -86,8 +107,6 @@ function drawTopData(){
 }
 
 function drawIBlock() {
-    if (rotation == 4)
-        rotation = 0;
     switch (rotation) {
         case 0:
         case 2:
@@ -115,12 +134,10 @@ function drawIBlock() {
             break;
     } 
     copyPieceToBoard();
-//    drawTetrominosOnBoard();
+    //    drawTetrominosOnBoard();
 }
 
 function drawOBlock() {
-    if (rotation == 4)
-        rotation = 0;
     switch (rotation) {
         case 0 :
         case 1 :
@@ -138,12 +155,10 @@ function drawOBlock() {
             break;
     } 
     copyPieceToBoard();
-//    drawTetrominosOnBoard();
+    //    drawTetrominosOnBoard();
 }
 
 function drawLBlock() {
-    if (rotation == 4)
-        rotation = 0;
     switch (rotation) {
         case 0 :
             blockWidth = 50;
@@ -191,12 +206,10 @@ function drawLBlock() {
             break;
     }
     copyPieceToBoard();
-//    drawTetrominosOnBoard();
+    //    drawTetrominosOnBoard();
 }
 
 function drawJBlock() {
-    if (rotation == 4)
-        rotation = 0;
     switch (rotation) {
         case 0 :
             blockWidth = 50;
@@ -244,12 +257,10 @@ function drawJBlock() {
             break;
     }
     copyPieceToBoard();
-//    drawTetrominosOnBoard();
+    //    drawTetrominosOnBoard();
 }
 
 function drawSBlock() {
-    if (rotation == 4)
-        rotation = 0;
     switch (rotation) {
         case 0 :
         case 2 :
@@ -277,12 +288,10 @@ function drawSBlock() {
             break;
     }
     copyPieceToBoard();
-//    drawTetrominosOnBoard();
+    //    drawTetrominosOnBoard();
 }
 
 function drawZBlock() {
-    if (rotation == 4)
-        rotation = 0;
     switch (rotation) {
         case 0 :
         case 2 :
@@ -310,12 +319,10 @@ function drawZBlock() {
             break;
     }
     copyPieceToBoard();
-//    drawTetrominosOnBoard();
+    //    drawTetrominosOnBoard();
 }
 
 function drawTBlock() {
-    if (rotation == 4)
-        rotation = 0;
     switch (rotation) {
         case 0 :
             blockWidth  = 75;
@@ -363,7 +370,7 @@ function drawTBlock() {
             break;
     }
     copyPieceToBoard();
-//    drawTetrominosOnBoard();
+    //    drawTetrominosOnBoard();
 }
 
 function xGridRefToCoordinate (xGridRef) {
@@ -377,8 +384,8 @@ function yGridRefToCoordinate (yGridRef) {
 }
 
 function copyPieceToBoard(){
-    for (var i=0; i<4; i++){
-        for (var j=0; j<4; j++) {
+    for (var i=0; i<pieceArray.length; i++){
+        for (var j=0; j<pieceArray.length; j++) {
             if (pieceArray[i][j] != 0)
                 gameBoard[yPosition+i][xPosition+j] = pieceArray[i][j];
 
@@ -420,15 +427,51 @@ function drawTetrominosOnBoard() {
 }
 
 function clearPiece() {
-    for (var i=0; i<4; i++){
-        for (j=0; j<4; j++) {
-            if (pieceArray[i][j] != 0)
+    for (var i=0; i<prevPieceArray.length; i++){
+        for (j=0; j<prevPieceArray.length; j++) {
+            if (prevPieceArray[i][j] != 0)
                 gameBoard[prevYPosition+i][prevXPosition+j] = 0;
 
         }
     }
     ctx.clearRect(150, 20, 400, 500);
     drawGameArea();
+}
+
+function generateRandomBlock() {
+    arrayOfBlockFunctions = [
+        drawIBlock,
+        drawJBlock,
+        drawLBlock,
+        drawOBlock,
+        drawSBlock,
+        drawTBlock,
+        drawZBlock,
+    ];
+
+    blockRef = Math.floor(Math.random()*arrayOfBlockFunctions.length);
+    arrayOfBlockFunctions[blockRef]();
+}
+
+function testAnimate() {
+    xPosition = 0;
+    yPosition = 0;
+    rotation = 0;
+    generateRandomBlock();
+    
+
+    setInterval(testLoop, 500);
+}
+
+function testLoop() {
+    prevXPosition = xPosition;
+    prevYPosition = yPosition;
+    prevRotation = rotation;
+    prevPieceArray = pieceArray;
+    yPosition++;
+    clearPiece();
+    arrayOfBlockFunctions[blockRef]();
+    drawTetrominosOnBoard();
 }
 
 
