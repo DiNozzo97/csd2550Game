@@ -11,7 +11,10 @@ var canvas,
     rotation,
     pieceArray,
     nextPiece,
-    gameBoard;
+    gameBoard,
+    score,
+    dropDelay,
+    gameOverState;
 
 // Detect Key Presses
 $( document ).keydown(function(event) {
@@ -22,6 +25,13 @@ $( document ).keydown(function(event) {
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
             prevRotation = rotation;
+            if (checkLeftCollision() == false) {
+                return;
+            }
+            xPosition--;
+            clearPiece();
+            arrayOfBlockFunctions[blockRef]();
+            drawTetrominosOnBoard();
             break;
         case 38: // Up Arrow Key
             console.log("Up Arrow");
@@ -29,6 +39,12 @@ $( document ).keydown(function(event) {
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
             prevRotation = rotation;
+            rotation++;
+            if (rotation == 4)
+                rotation = 0;
+            clearPiece();
+            arrayOfBlockFunctions[blockRef]();
+            drawTetrominosOnBoard();
 
             break;
         case 39: // Right Arrow Key
@@ -37,15 +53,35 @@ $( document ).keydown(function(event) {
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
             prevRotation = rotation;
+            if (checkRightCollision() == false) {
+                return;
+            }
+            xPosition++;
+            clearPiece();
+            arrayOfBlockFunctions[blockRef]();
+            drawTetrominosOnBoard();
 
             break;
-        case 40: // Down Arrow Key
         case 32: // Space bar Key
+            if (gameOverState == true) {
+                initGame();
+                return;
+            }
+        case 40: // Down Arrow Key
             console.log("Down Arrow Or SpaceBar");
             prevXPosition = xPosition;
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
             prevRotation = rotation;
+            if (checkYCollision() == false) {
+                clearInterval(mainInterval);
+                testAnimate();
+                return;
+            }
+            yPosition++;
+            clearPiece();
+            arrayOfBlockFunctions[blockRef]();
+            drawTetrominosOnBoard();
             break;
     }
 });
@@ -54,6 +90,10 @@ $( document ).keydown(function(event) {
 function initGame() {
     canvas = document.getElementById("mainCanvas");
     ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    score = 0;
+    gameOverState = false;
+    dropDelay = 500;
     drawTopData();
     // Create an array to represent the game board
     gameBoard = new Array()
@@ -100,9 +140,9 @@ function drawTopData(){
     ctx.font="15px Arial";
     ctx.fillStyle = "rgb(0,0,0)";
     if (sessionStorage.signedIn == 'true')
-        ctx.fillText("Name: "+sessionStorage.currentFirstName+" "+sessionStorage.currentLastName+"  Your High Score: "+sessionStorage.highScore,5,15);
+        ctx.fillText("Name: "+sessionStorage.currentFirstName+" "+sessionStorage.currentLastName+"  Your High Score: "+sessionStorage.highScore+"      Score: "+score,5,15);
     else
-        ctx.fillText("Name: Guest   Your High Score: Please Sign In to save your scores. ",5,15);
+        ctx.fillText("Please Sign In to save your scores.      Score: "+score,5,15);
 
 }
 
@@ -110,8 +150,8 @@ function drawIBlock() {
     switch (rotation) {
         case 0:
         case 2:
-            blockWidth = 25;
-            blockHeight = 100;
+            blockWidth = 1;
+            blockHeight = 4;
             pieceArray = 
                 [   
                 [1, 0, 0, 0],
@@ -122,8 +162,8 @@ function drawIBlock() {
             break;
         case 1:
         case 3:
-            blockWidth = 100;
-            blockHeight = 25;
+            blockWidth = 4;
+            blockHeight = 1;
             pieceArray = 
                 [   
                 [1, 1, 1, 1],
@@ -143,8 +183,8 @@ function drawOBlock() {
         case 1 :
         case 2 :
         case 3 :
-            blockWidth = 50;
-            blockHeight = 50;
+            blockWidth = 2;
+            blockHeight = 2;
             pieceArray = 
                 [   
                 [2, 2, 0, 0],
@@ -161,8 +201,8 @@ function drawOBlock() {
 function drawLBlock() {
     switch (rotation) {
         case 0 :
-            blockWidth = 50;
-            blockHeight = 75;
+            blockWidth = 2;
+            blockHeight = 3;
             pieceArray = 
                 [   
                 [3, 0, 0, 0],
@@ -172,8 +212,8 @@ function drawLBlock() {
             ];
             break;
         case 1 :
-            blockWidth = 75;
-            blockHeight = 50;
+            blockWidth = 3;
+            blockHeight = 2;
             pieceArray = 
                 [   
                 [3, 3, 3, 0],
@@ -183,8 +223,8 @@ function drawLBlock() {
             ];
             break;
         case 2 :
-            blockWidth = 50;
-            blockHeight = 75;
+            blockWidth = 2;
+            blockHeight = 3;
             pieceArray = 
                 [   
                 [3, 3, 0, 0],
@@ -194,8 +234,8 @@ function drawLBlock() {
             ];
             break;
         case 3 :
-            blockWidth = 75;
-            blockHeight = 50;
+            blockWidth = 3;
+            blockHeight = 2;
             pieceArray = 
                 [   
                 [0, 0, 3, 0],
@@ -212,8 +252,8 @@ function drawLBlock() {
 function drawJBlock() {
     switch (rotation) {
         case 0 :
-            blockWidth = 50;
-            blockHeight = 75;
+            blockWidth = 2;
+            blockHeight = 3;
             pieceArray = 
                 [   
                 [0, 4, 0, 0],
@@ -223,8 +263,8 @@ function drawJBlock() {
             ];
             break;
         case 1 :
-            blockWidth = 75;
-            blockHeight = 50;
+            blockWidth = 3;
+            blockHeight = 2;
             pieceArray = 
                 [   
                 [4, 0, 0, 0],
@@ -234,8 +274,8 @@ function drawJBlock() {
             ];
             break;
         case 2 :
-            blockWidth = 50;
-            blockHeight = 75;
+            blockWidth = 2;
+            blockHeight = 3;
             pieceArray = 
                 [   
                 [4, 4, 0, 0],
@@ -245,8 +285,8 @@ function drawJBlock() {
             ];
             break;
         case 3 :
-            blockWidth = 75;
-            blockHeight = 50;
+            blockWidth = 3;
+            blockHeight = 2;
             pieceArray = 
                 [   
                 [4, 4, 4, 0],
@@ -264,8 +304,8 @@ function drawSBlock() {
     switch (rotation) {
         case 0 :
         case 2 :
-            blockWidth  = 75;
-            blockHeight = 50;
+            blockWidth  = 3;
+            blockHeight = 2;
             pieceArray = 
                 [   
                 [0, 5, 5, 0],
@@ -276,8 +316,8 @@ function drawSBlock() {
             break;
         case 1 :
         case 3 :
-            blockWidth = 50;
-            blockHeight = 75;
+            blockWidth = 2;
+            blockHeight = 3;
             pieceArray = 
                 [   
                 [5, 0, 0, 0],
@@ -295,8 +335,8 @@ function drawZBlock() {
     switch (rotation) {
         case 0 :
         case 2 :
-            blockWidth  = 75;
-            blockHeight = 50;
+            blockWidth  = 3;
+            blockHeight = 2;
             pieceArray = 
                 [   
                 [6, 6, 0, 0],
@@ -307,8 +347,8 @@ function drawZBlock() {
             break;
         case 1 :
         case 3 :
-            blockWidth = 50;
-            blockHeight = 75;
+            blockWidth = 2;
+            blockHeight = 3;
             pieceArray = 
                 [   
                 [0, 6, 0, 0],
@@ -325,8 +365,8 @@ function drawZBlock() {
 function drawTBlock() {
     switch (rotation) {
         case 0 :
-            blockWidth  = 75;
-            blockHeight = 50;
+            blockWidth  = 3;
+            blockHeight = 2;
             pieceArray = 
                 [   
                 [0, 7, 0, 0],
@@ -336,8 +376,8 @@ function drawTBlock() {
             ];
             break;
         case 1 :
-            blockWidth  = 50;
-            blockHeight = 75;
+            blockWidth  = 2;
+            blockHeight = 3;
             pieceArray = 
                 [   
                 [7, 0, 0, 0],
@@ -347,8 +387,8 @@ function drawTBlock() {
             ];
             break;
         case 2 :
-            blockWidth  = 75;
-            blockHeight = 50;
+            blockWidth  = 3;
+            blockHeight = 2;
             pieceArray = 
                 [   
                 [7, 7, 7, 0],
@@ -358,8 +398,8 @@ function drawTBlock() {
             ];
             break;
         case 3 :
-            blockWidth  = 50;
-            blockHeight = 75;
+            blockWidth  = 2;
+            blockHeight = 3;
             pieceArray = 
                 [   
                 [0, 7, 0, 0],
@@ -454,24 +494,164 @@ function generateRandomBlock() {
 }
 
 function testAnimate() {
-    xPosition = 0;
+    xPosition = 7;
     yPosition = 0;
     rotation = 0;
+    clearFullLines();
     generateRandomBlock();
-    
 
-    setInterval(testLoop, 500);
+    mainInterval =  setInterval(testLoop, dropDelay);
 }
 
 function testLoop() {
     prevXPosition = xPosition;
     prevYPosition = yPosition;
     prevRotation = rotation;
-    prevPieceArray = pieceArray;
+    prevPieceArray = pieceArray
+    if (checkYCollision() == false) {
+        clearInterval(mainInterval);
+        if (yPosition == 0) {
+            gameOver();
+            return;
+        }
+        testAnimate();
+        return;
+    }
+
     yPosition++;
     clearPiece();
     arrayOfBlockFunctions[blockRef]();
     drawTetrominosOnBoard();
+}
+
+function checkYCollision() {
+    bottomEdges = [];
+    var tempBottom = [];
+    for (var i=0; i<pieceArray.length; i++) {
+        for (var j=0; j<pieceArray.length; j++) {
+            if (pieceArray[j][i] != 0){
+                tempBottom = [yPosition+j,xPosition+i];
+            }
+        }
+        if (bottomEdges[bottomEdges.length-1] != tempBottom)
+            bottomEdges.push(tempBottom);
+    }
+    for (var i=0; i<bottomEdges.length; i++) { // Bottom of the board
+        if (bottomEdges[i][0] + 1 > 19) {
+            return false;
+        }
+        else if (gameBoard[bottomEdges[i][0] + 1][bottomEdges[i][1]] != 0) { // Another tile
+            return false;
+        }
+    }
+    return true;
+
+}
+
+function checkLeftCollision() {
+    leftEdges = [];
+    var tempLeft = [];
+    for (var i=0; i<pieceArray.length; i++) {
+        leftFound = false;
+        for (var j=0; j<pieceArray.length; j++) {
+            if (pieceArray[i][j] != 0 && leftFound == false){
+                tempLeft =  [yPosition+i,xPosition+j];
+                leftFound = true;
+            }
+        }
+        if (leftEdges[leftEdges.length-1] != tempLeft)
+            leftEdges.push(tempLeft);
+    }
+
+    for (var i=0; i<leftEdges.length; i++) { // Side of the board
+        if (leftEdges[i][1] - 1 < 0) {
+            console.log("Side of Board");
+            return false;
+        }
+        else if (gameBoard[leftEdges[i][0]][leftEdges[i][1] - 1 ] != 0) { // Another tile
+            console.log("Another Tile");
+            return false;
+        }
+    }
+    return true;
+
+}
+
+function checkRightCollision() {
+    rightEdges = [];
+    var tempRight = [];
+    for (var i=0; i<pieceArray.length; i++) {
+        for (var j=0; j<pieceArray.length; j++) {
+            if (pieceArray[i][j] != 0){
+                tempRight =  [yPosition+i,xPosition+j];
+            }
+        }
+        if (rightEdges[rightEdges.length-1] != tempRight)
+            rightEdges.push(tempRight);
+    }
+
+    for (var i=0; i<rightEdges.length; i++) { // Side of the board
+        if (rightEdges[i][1] + 1 > 13) {
+            console.log("Side of Board");
+            return false;
+        }
+        else if (gameBoard[rightEdges[i][0]][rightEdges[i][1] + 1 ] != 0) { // Another tile
+            console.log("Another Tile");
+            return false;
+        }
+    }
+    return true;
+
+}
+
+
+function clearFullLines() {
+    for (var i=0; i<gameBoard.length; i++) {
+        lineNo = i;
+        completeLine = true;
+        for (var j=0; j<gameBoard[1].length; j++) {
+            if (gameBoard[i][j] == 0){
+                completeLine = false;
+                //                console.log("FALSE");
+            }
+        }
+        if (completeLine == true) {
+            tempGameBoard = gameBoard.slice(0);
+            for (var k=1; k<=i; k++) {
+                gameBoard[k] = tempGameBoard[k-1];
+            }
+            gameBoard[0] = [];
+            for (var l=0; l <= 13; l++) {
+                gameBoard[0].push(0);
+            }
+            drawTetrominosOnBoard();
+            score += 10;
+            dropDelay -= 10;
+            drawTopData();
+        }
+    }
+}
+
+function gameOver() {
+    if (sessionStorage.signedIn == "true") {
+        if (sessionStorage.currentPostToScores == "true" && score > 0)
+            saveScore(score);
+        if (score > sessionStorage.highScore) {
+            sessionStorage.highScore = score;
+            usersObj = JSON.parse(localStorage.users)
+            usersObj[sessionStorage.currentArrayPosition].highScore = score
+        }
+    }
+    gameOverState = true;
+    ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font="75px Arial";
+    ctx.fillStyle = "rgb(255,255,255)";
+    ctx.fillText("Game Over",50,canvas.height/2 -5);
+    ctx.font="20px Arial";
+    ctx.fillText("Press the spacebar to play again",100,canvas.height/2 + 45);
+
 }
 
 

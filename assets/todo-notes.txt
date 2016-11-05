@@ -1,6 +1,7 @@
 TO DO:
-- Implement Arrow controls
-- Implement Move checking functions
+- Implement Rotation checking functions
+- Implement Next Piece
+- Restart ?
 - Code prettying up
 
 
