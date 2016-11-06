@@ -31,6 +31,7 @@ $( document ).keydown(function(event) {
             xPosition--;
             clearPiece();
             arrayOfBlockFunctions[blockRef]();
+            copyPieceToBoard();
             drawTetrominosOnBoard();
             break;
         case 38: // Up Arrow Key
@@ -39,13 +40,12 @@ $( document ).keydown(function(event) {
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
             prevRotation = rotation;
-            rotation++;
-            if (rotation == 4)
-                rotation = 0;
+            clearPiece();
+            checkRotationCollision();
             clearPiece();
             arrayOfBlockFunctions[blockRef]();
+            copyPieceToBoard();
             drawTetrominosOnBoard();
-
             break;
         case 39: // Right Arrow Key
             console.log("Right Arrow");
@@ -59,6 +59,7 @@ $( document ).keydown(function(event) {
             xPosition++;
             clearPiece();
             arrayOfBlockFunctions[blockRef]();
+            copyPieceToBoard();
             drawTetrominosOnBoard();
 
             break;
@@ -81,6 +82,7 @@ $( document ).keydown(function(event) {
             yPosition++;
             clearPiece();
             arrayOfBlockFunctions[blockRef]();
+            copyPieceToBoard();
             drawTetrominosOnBoard();
             break;
     }
@@ -173,7 +175,7 @@ function drawIBlock() {
             ];
             break;
     } 
-    copyPieceToBoard();
+    //    copyPieceToBoard();
     //    drawTetrominosOnBoard();
 }
 
@@ -194,7 +196,7 @@ function drawOBlock() {
             ];
             break;
     } 
-    copyPieceToBoard();
+    //    copyPieceToBoard();
     //    drawTetrominosOnBoard();
 }
 
@@ -245,7 +247,7 @@ function drawLBlock() {
             ];
             break;
     }
-    copyPieceToBoard();
+    //    copyPieceToBoard();
     //    drawTetrominosOnBoard();
 }
 
@@ -296,7 +298,7 @@ function drawJBlock() {
             ];
             break;
     }
-    copyPieceToBoard();
+    //    copyPieceToBoard();
     //    drawTetrominosOnBoard();
 }
 
@@ -327,7 +329,7 @@ function drawSBlock() {
             ];
             break;
     }
-    copyPieceToBoard();
+    //    copyPieceToBoard();
     //    drawTetrominosOnBoard();
 }
 
@@ -358,7 +360,7 @@ function drawZBlock() {
             ];
             break;
     }
-    copyPieceToBoard();
+    //    copyPieceToBoard();
     //    drawTetrominosOnBoard();
 }
 
@@ -409,7 +411,7 @@ function drawTBlock() {
             ];
             break;
     }
-    copyPieceToBoard();
+    //    copyPieceToBoard();
     //    drawTetrominosOnBoard();
 }
 
@@ -461,6 +463,7 @@ function drawTetrominosOnBoard() {
                         break;
                 }
                 ctx.fillRect(xGridRefToCoordinate(j), yGridRefToCoordinate(i), 25, 25);
+                ctx.strokeRect(xGridRefToCoordinate(j),yGridRefToCoordinate(i),25,25);
             }
         }
     }
@@ -491,6 +494,7 @@ function generateRandomBlock() {
 
     blockRef = Math.floor(Math.random()*arrayOfBlockFunctions.length);
     arrayOfBlockFunctions[blockRef]();
+    copyPieceToBoard();
 }
 
 function testAnimate() {
@@ -521,6 +525,7 @@ function testLoop() {
     yPosition++;
     clearPiece();
     arrayOfBlockFunctions[blockRef]();
+    copyPieceToBoard();
     drawTetrominosOnBoard();
 }
 
@@ -604,6 +609,38 @@ function checkRightCollision() {
 
 }
 
+function checkRotationCollision() {
+    rotation++;
+    if (rotation == 4) {
+        rotation = 0;
+    }
+    arrayOfBlockFunctions[blockRef]();
+    if (xPosition + blockWidth > 14) {
+        console.log("Rotation Collision with side");
+        rotation--;
+        return;
+    }
+    
+    if (yPosition + blockHeight > 20) {
+        console.log("Rotation Collision with bottom");
+        rotation--;
+        return;
+    }
+    
+    
+    for (var i=0; i<pieceArray.length; i++){
+        for (var j=0; j<pieceArray.length; j++) {
+            if (pieceArray[i][j] != 0) {
+                if (gameBoard[yPosition+i][xPosition+j] != 0) {
+                    console.log("Rotation Collision with tile");
+                    rotation--;
+                    return;
+                }
+            }
+        }
+    }
+}
+
 
 function clearFullLines() {
     for (var i=0; i<gameBoard.length; i++) {
@@ -612,7 +649,6 @@ function clearFullLines() {
         for (var j=0; j<gameBoard[1].length; j++) {
             if (gameBoard[i][j] == 0){
                 completeLine = false;
-                //                console.log("FALSE");
             }
         }
         if (completeLine == true) {
@@ -648,9 +684,11 @@ function gameOver() {
 
     ctx.font="75px Arial";
     ctx.fillStyle = "rgb(255,255,255)";
-    ctx.fillText("Game Over",50,canvas.height/2 -5);
+    ctx.fillText("Game Over",50,canvas.height/2 -30);
+    ctx.font="35px Arial";
+    ctx.fillText("Score: "+score,190,canvas.height/2 + 10);
     ctx.font="20px Arial";
-    ctx.fillText("Press the spacebar to play again",100,canvas.height/2 + 45);
+    ctx.fillText("Press the spacebar to play again",110,canvas.height/2 + 45);
 
 }
 

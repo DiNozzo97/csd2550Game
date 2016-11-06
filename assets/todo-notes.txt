@@ -1,7 +1,6 @@
 TO DO:
-- Implement Rotation checking functions
 - Implement Next Piece
-- Restart ?
+- Restart/Pause ?
 - Code prettying up
 
 
