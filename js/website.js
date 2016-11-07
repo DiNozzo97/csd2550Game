@@ -348,7 +348,7 @@ function processSignIn() {
     $(".has-success").removeClass("has-success");
     var userAuthenticated = false,
         existingUsers = JSON.parse(localStorage.users); // convert the JSON users into a JS object
-    for (var i = 0; i < existingUsers.length; i += 1) { // Get the value of email address and find it in the user array
+    for (var i = 0; i < existingUsers.length; i++) { // Get the value of email address and find it in the user array
         if (existingUsers[i].emailAddress == $('#emailSignIn').val().toLowerCase()) { // if the email address is found
             if (existingUsers[i].passwordHash == ($.md5(existingUsers[i].passwordSalt + $('#passwordSignIn').val()))) { // and the password matches
                 // set session storage data
@@ -371,10 +371,11 @@ function processSignIn() {
                 $("#signInForm").trigger('reset');
                 // update the settings fields with the signed in users details, ready for editing.
                 resetSettings();
+
             }
         }
     }
-    
+
     if (userAuthenticated == false) { // if the user didn't enter a matching email/password
         $("#signInGroup").addClass("has-error"); // make the inputs glow red
         alertActivator("signIn", "danger", "Incorrect email/password combination", false); // alert the user that they didn't enter the correct credentials (not too specific for security reasons)
@@ -405,6 +406,8 @@ function checkLoginStatus() {
         // Display the 'signed in' version of the navigation bar (and hide the guest version)if the user is signed in and vice versa
         $("#guestNavButton").hide();
         $("#signedInNavButton").show();
+        // Redraw the top data to show the users stats
+        drawTopData();
     } else {
         $("#guestNavButton").show();
         $("#signedInNavButton").hide();
@@ -470,7 +473,7 @@ function deleteScores() {
             newScoresObj.push(existingScoresObj[i]);
         }
     }
-    
+
     // update local storage with the new object
     localStorage.scores = JSON.stringify(newScoresObj);
     // hide the delete scores modal
@@ -521,6 +524,8 @@ $( document ).ready(function() {
         checkLoginStatus();
         $('.alert').hide();
         alertActivator("main", "success", "You have successfully signed out!", true);
+        // Redraw the top data to show the users stats
+        drawTopData();
     });
     // When the each button is pressed ->  add 'active' class and remove 'active' class from other buttons
     $( "#playButton" ).click(function() {
@@ -552,7 +557,7 @@ $( document ).ready(function() {
     // Make the checkboxs into switches switch
     $("#publicScoresRegister").bootstrapSwitch();
     $("#publicScoresSettings").bootstrapSwitch();
-    
+
     // Initiste the game
     initGame();
 
