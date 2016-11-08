@@ -16,6 +16,8 @@ var canvas,
     dropDelay,
     gameOverState;
 
+var soundTrack = new Audio('assets/soundtrack.mp3');
+
 // Detect Key Presses
 $( document ).keydown(function(event) {
     switch (event.which) {
@@ -107,6 +109,8 @@ function initGame() {
         }
     }
     drawGameArea();
+    soundTrack.load();
+    soundTrack.play();
     testAnimate();
 }
 
@@ -689,6 +693,7 @@ function gameOver() {
     ctx.fillText("Score: "+score,190,canvas.height/2 + 10);
     ctx.font="20px Arial";
     ctx.fillText("Press the spacebar to play again",110,canvas.height/2 + 45);
+    soundTrack.pause();
 
 }
 
