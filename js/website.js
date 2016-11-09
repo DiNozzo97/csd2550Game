@@ -1,6 +1,6 @@
 // The function resetSessionStorage removes the data of the previously signed in user and resets each value to the default load value
 function resetSessionStorage() {
-    sessionStorage.signedIn = "false";
+    sessionStorage.signedIn = false;
     sessionStorage.currentArrayPosition = false;
     sessionStorage.currentId = "";
     sessionStorage.currentFirstName = "";
@@ -407,7 +407,7 @@ function checkLoginStatus() {
         $("#guestNavButton").hide();
         $("#signedInNavButton").show();
         // Redraw the top data to show the users stats
-        drawTopData();
+        initGame();
     } else {
         $("#guestNavButton").show();
         $("#signedInNavButton").hide();
@@ -525,7 +525,7 @@ $( document ).ready(function() {
         $('.alert').hide();
         alertActivator("main", "success", "You have successfully signed out!", true);
         // Redraw the top data to show the users stats
-        drawTopData();
+        initGame();
     });
     // When the each button is pressed ->  add 'active' class and remove 'active' class from other buttons
     $( "#playButton" ).click(function() {
@@ -534,13 +534,16 @@ $( document ).ready(function() {
     $( "#scoresButton" ).click(function() {
         activateNavButton("scoresButton");
         displayScores();
+        pause();
     });
     $( "#guestNavButton" ).click(function() {
         activateNavButton("guestNavButton");
+        pause();
     });
     $( "#settingsButton" ).click(function() {
         activateNavButton("signedInNavButton");
         resetSettings();
+        pause();
     });
 
     // When the sign in/scores/settings modal is closed, make play active again
@@ -558,7 +561,7 @@ $( document ).ready(function() {
     $("#publicScoresRegister").bootstrapSwitch();
     $("#publicScoresSettings").bootstrapSwitch();
 
-    // Initiste the game
+    // Initialise the game
     initGame();
 
 

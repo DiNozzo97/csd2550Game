@@ -1,3 +1,4 @@
+// Initialise Global Variables
 var canvas,
     paused,
     ctx,
@@ -18,31 +19,37 @@ var canvas,
     dropDelay,
     gameOverState;
 
-var soundTrack = new Audio('assets/soundtrack.mp3');
-var lineClearedSound = new Audio('assets/lineCleared.mp3')
 
 // Detect Key Presses
 $( document ).keydown(function(event) {
     switch (event.which) {
+        case 65: // 'A' Key
         case 37: // Left Arrow Key
-            console.log("Left Arrow");
+            // If the 'A' Key or left arrow key are pressed, see if the game is paused or in the gameover state, if it is then ignore the keypress and return.
             if (paused == true || gameOverState == true)
                 return;
+            // Otherwise store all of the current block's properties to variables, so that they can be cleared later.
             prevXPosition = xPosition;
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
             prevRotation = rotation;
+            // Check to see whether the users requested move is valid (will the block collide with the side of the board or another block?), if it isn't then return.
             if (checkLeftCollision() == false) {
                 return;
             }
+            // At this point, we know that the move is valid. We therefore decrease the xPosition by 1 (moving the block 1 unit to the left)
             xPosition--;
+            // Delete the current block from the gameBoard array and then clear/redraw the glaying area background
             clearPiece();
+            // set the block variables to the current block
             arrayOfBlockFunctions[currentPiece]();
+            // copy the block (in it's new position) to the gameBoard array
             copyPieceToBoard();
+            // Draw all of the blocks onto the canvas grid based on the gameBoard array
             drawTetrominosOnBoard();
             break;
+        case 87: // 'W' Key
         case 38: // Up Arrow Key
-            console.log("Up Arrow");
             if (paused == true || gameOverState == true)
                 return;
             prevXPosition = xPosition;
@@ -56,8 +63,8 @@ $( document ).keydown(function(event) {
             copyPieceToBoard();
             drawTetrominosOnBoard();
             break;
+        case 68: // 'D' Key
         case 39: // Right Arrow Key
-            console.log("Right Arrow");
             if (paused == true || gameOverState == true)
                 return;
             prevXPosition = xPosition;
@@ -79,8 +86,8 @@ $( document ).keydown(function(event) {
                 initGame();
                 return;
             }
+        case 83: // 'S' Key
         case 40: // Down Arrow Key
-            console.log("Down Arrow Or SpaceBar");
             if (paused == true || gameOverState == true)
                 return;
             prevXPosition = xPosition;
@@ -98,6 +105,7 @@ $( document ).keydown(function(event) {
             copyPieceToBoard();
             drawTetrominosOnBoard();
             break;
+        case 80: // 'P' Key
         case 27: // Escape Key
             if (gameOverState == true)
                 return;
@@ -111,6 +119,9 @@ $( document ).keydown(function(event) {
 
 
 function initGame() {
+    if (typeof mainInterval !== 'undefined') {
+        clearInterval(mainInterval);
+    }
     canvas = document.getElementById("mainCanvas");
     ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -139,8 +150,6 @@ function initGame() {
     }
 
     drawGameArea();
-    soundTrack.load();
-    soundTrack.play();
     generateRandomBlock();
     newBlock();
 }
@@ -214,8 +223,6 @@ function drawIBlock() {
             ];
             break;
     } 
-    //    copyPieceToBoard();
-    //    drawTetrominosOnBoard();
 }
 
 function drawOBlock() {
@@ -235,8 +242,6 @@ function drawOBlock() {
             ];
             break;
     } 
-    //    copyPieceToBoard();
-    //    drawTetrominosOnBoard();
 }
 
 function drawLBlock() {
@@ -286,8 +291,6 @@ function drawLBlock() {
             ];
             break;
     }
-    //    copyPieceToBoard();
-    //    drawTetrominosOnBoard();
 }
 
 function drawJBlock() {
@@ -337,8 +340,6 @@ function drawJBlock() {
             ];
             break;
     }
-    //    copyPieceToBoard();
-    //    drawTetrominosOnBoard();
 }
 
 function drawSBlock() {
@@ -368,8 +369,6 @@ function drawSBlock() {
             ];
             break;
     }
-    //    copyPieceToBoard();
-    //    drawTetrominosOnBoard();
 }
 
 function drawZBlock() {
@@ -399,8 +398,6 @@ function drawZBlock() {
             ];
             break;
     }
-    //    copyPieceToBoard();
-    //    drawTetrominosOnBoard();
 }
 
 function drawTBlock() {
@@ -450,8 +447,6 @@ function drawTBlock() {
             ];
             break;
     }
-    //    copyPieceToBoard();
-    //    drawTetrominosOnBoard();
 }
 
 function xGridRefToGameBoardCoordinate (xGridRef) {
@@ -661,11 +656,9 @@ function checkLeftCollision() {
 
     for (var i=0; i<leftEdges.length; i++) { // Side of the board
         if (leftEdges[i][1] - 1 < 0) {
-            console.log("Side of Board");
             return false;
         }
         else if (gameBoard[leftEdges[i][0]][leftEdges[i][1] - 1 ] != 0) { // Another tile
-            console.log("Another Tile");
             return false;
         }
     }
@@ -688,11 +681,9 @@ function checkRightCollision() {
 
     for (var i=0; i<rightEdges.length; i++) { // Side of the board
         if (rightEdges[i][1] + 1 > 13) {
-            console.log("Side of Board");
             return false;
         }
         else if (gameBoard[rightEdges[i][0]][rightEdges[i][1] + 1 ] != 0) { // Another tile
-            console.log("Another Tile");
             return false;
         }
     }
@@ -707,13 +698,11 @@ function checkRotationCollision() {
     }
     arrayOfBlockFunctions[currentPiece]();
     if (xPosition + blockWidth > 14) {
-        console.log("Rotation Collision with side");
         rotation--;
         return;
     }
 
     if (yPosition + blockHeight > 20) {
-        console.log("Rotation Collision with bottom");
         rotation--;
         return;
     }
@@ -723,7 +712,6 @@ function checkRotationCollision() {
         for (var j=0; j<pieceArray.length; j++) {
             if (pieceArray[i][j] != 0) {
                 if (gameBoard[yPosition+i][xPosition+j] != 0) {
-                    console.log("Rotation Collision with tile");
                     rotation--;
                     return;
                 }
@@ -751,8 +739,6 @@ function clearFullLines() {
             for (var l=0; l <= 13; l++) {
                 gameBoard[0].push(0);
             }
-            lineClearedSound.load();
-            lineClearedSound.play();
             drawTetrominosOnBoard();
             score += 10;
             dropDelay -= 10;
@@ -782,7 +768,6 @@ function gameOver() {
     ctx.fillText("Score: "+score,190,canvas.height/2 + 10);
     ctx.font="20px Arial";
     ctx.fillText("Press the spacebar to play again",110,canvas.height/2 + 45);
-    soundTrack.pause();
 
 }
 
@@ -790,13 +775,11 @@ function pause() {
     paused = true;
     ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     ctx.font="30px Arial";
     ctx.fillStyle = "rgb(255,255,255)";
     ctx.fillText("Paused",200,canvas.height/2 -30);
     ctx.font="25px Arial";
     ctx.fillText("Press the 'esc' key to resume",90,canvas.height/2 + 10);
-    soundTrack.pause();
     clearInterval(mainInterval);
 }
 
@@ -807,7 +790,6 @@ function resume() {
     drawGameArea();
     drawTetrominosOnBoard();
     mainInterval = setInterval(mainLoop, dropDelay);
-    soundTrack.play(); 
 }
 
 
