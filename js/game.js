@@ -1,4 +1,5 @@
 var canvas,
+    paused,
     ctx,
     blockWidth,
     blockHeight,
@@ -11,18 +12,22 @@ var canvas,
     rotation,
     pieceArray,
     nextPiece,
+    currentPiece,
     gameBoard,
     score,
     dropDelay,
     gameOverState;
 
 var soundTrack = new Audio('assets/soundtrack.mp3');
+var lineClearedSound = new Audio('assets/lineCleared.mp3')
 
 // Detect Key Presses
 $( document ).keydown(function(event) {
     switch (event.which) {
         case 37: // Left Arrow Key
             console.log("Left Arrow");
+            if (paused == true || gameOverState == true)
+                return;
             prevXPosition = xPosition;
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
@@ -32,12 +37,14 @@ $( document ).keydown(function(event) {
             }
             xPosition--;
             clearPiece();
-            arrayOfBlockFunctions[blockRef]();
+            arrayOfBlockFunctions[currentPiece]();
             copyPieceToBoard();
             drawTetrominosOnBoard();
             break;
         case 38: // Up Arrow Key
             console.log("Up Arrow");
+            if (paused == true || gameOverState == true)
+                return;
             prevXPosition = xPosition;
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
@@ -45,12 +52,14 @@ $( document ).keydown(function(event) {
             clearPiece();
             checkRotationCollision();
             clearPiece();
-            arrayOfBlockFunctions[blockRef]();
+            arrayOfBlockFunctions[currentPiece]();
             copyPieceToBoard();
             drawTetrominosOnBoard();
             break;
         case 39: // Right Arrow Key
             console.log("Right Arrow");
+            if (paused == true || gameOverState == true)
+                return;
             prevXPosition = xPosition;
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
@@ -60,7 +69,7 @@ $( document ).keydown(function(event) {
             }
             xPosition++;
             clearPiece();
-            arrayOfBlockFunctions[blockRef]();
+            arrayOfBlockFunctions[currentPiece]();
             copyPieceToBoard();
             drawTetrominosOnBoard();
 
@@ -72,20 +81,30 @@ $( document ).keydown(function(event) {
             }
         case 40: // Down Arrow Key
             console.log("Down Arrow Or SpaceBar");
+            if (paused == true || gameOverState == true)
+                return;
             prevXPosition = xPosition;
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
             prevRotation = rotation;
             if (checkYCollision() == false) {
                 clearInterval(mainInterval);
-                testAnimate();
+                newBlock();
                 return;
             }
             yPosition++;
             clearPiece();
-            arrayOfBlockFunctions[blockRef]();
+            arrayOfBlockFunctions[currentPiece]();
             copyPieceToBoard();
             drawTetrominosOnBoard();
+            break;
+        case 27: // Escape Key
+            if (gameOverState == true)
+                return;
+            if (paused == false) 
+                pause();
+            else 
+                resume();
             break;
     }
 });
@@ -97,29 +116,45 @@ function initGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     score = 0;
     gameOverState = false;
+    paused = false;
     dropDelay = 500;
     drawTopData();
     // Create an array to represent the game board
-    gameBoard = new Array()
+    gameBoard = new Array();
     for (var r=0; r<20; r++) {
-        gameBoard[r] = new Array(14);
+        gameBoard[r] = new Array();
         for (var c=0; c<14; c++) {
             gameBoard[r][c] = 0;
 
         }
     }
+
+    nextPieceBoard = new Array();
+    for (var r=0; r<4; r++) {
+        nextPieceBoard[r] = new Array();
+        for (var c=0; c<4; c++) {
+            nextPieceBoard[r][c] = 0;
+
+        }
+    }
+
     drawGameArea();
     soundTrack.load();
     soundTrack.play();
-    testAnimate();
+    generateRandomBlock();
+    newBlock();
 }
 
 function drawGameArea() {
     ctx.clearRect(0, 20, canvas.width, 480);
     ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     // Draw area next piece panel
-    ctx.fillRect(0, 20, 150, 150);
+    ctx.fillRect(0, 20, 150, 170);
+    ctx.font="15px Arial";
+    ctx.fillStyle = "rgb(0,0,0)";
+    ctx.fillText("Next Piece:", 5, 35);
     // Draw Main game area
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     ctx.fillRect(150, 20, 400, 500);
     // Draw Main game area vertical grid
     for (var i=150; i<550; i+=25) {
@@ -419,13 +454,23 @@ function drawTBlock() {
     //    drawTetrominosOnBoard();
 }
 
-function xGridRefToCoordinate (xGridRef) {
+function xGridRefToGameBoardCoordinate (xGridRef) {
     xCoordinate = 150 + (xGridRef * 25);
     return xCoordinate;
 }
 
-function yGridRefToCoordinate (yGridRef) {
+function yGridRefToGameBoardCoordinate (yGridRef) {
     yCoordinate = 20 + (yGridRef * 25);
+    return yCoordinate;
+}
+
+function xGridRefToNextPieceCoordinate (xGridRef) {
+    xCoordinate = 35 + (xGridRef * 30);
+    return xCoordinate;
+}
+
+function yGridRefToNextPieceCoordinate (yGridRef) {
+    yCoordinate = 60 + (yGridRef * 30);
     return yCoordinate;
 }
 
@@ -438,6 +483,11 @@ function copyPieceToBoard(){
         }
     }
 }
+
+function copyPieceToNextPiece(){
+    nextPieceBoard = pieceArray;
+}
+
 
 function drawTetrominosOnBoard() {
     for (var i=0; i<20; i++){
@@ -466,9 +516,43 @@ function drawTetrominosOnBoard() {
                         ctx.fillStyle = "#b600b6";
                         break;
                 }
-                ctx.fillRect(xGridRefToCoordinate(j), yGridRefToCoordinate(i), 25, 25);
-                ctx.strokeRect(xGridRefToCoordinate(j),yGridRefToCoordinate(i),25,25);
+                ctx.fillRect(xGridRefToGameBoardCoordinate(j), yGridRefToGameBoardCoordinate(i), 25, 25);
+                ctx.strokeRect(xGridRefToGameBoardCoordinate(j),yGridRefToGameBoardCoordinate(i),25,25);
             }
+        }
+    }
+
+    for (var i=0; i<4; i++){
+        for (var j=0; j<4; j++) {
+            if (nextPieceBoard[i][j] != 0) {
+
+                switch (nextPieceBoard[i][j]){
+                    case 1: // Cyan (I Block)
+                        ctx.fillStyle = "#00FFFF";
+                        break;
+                    case 2: // Yellow (O Block)
+                        ctx.fillStyle = "#FFFF00";
+                        break;
+                    case 3: // Orange (L Block)
+                        ctx.fillStyle = "#FFA500";
+                        break;
+                    case 4: // Blue (J Block)
+                        ctx.fillStyle = "#0000FF";
+                        break;
+                    case 5: // Green (S Block)
+                        ctx.fillStyle = "#00FF00";
+                        break;
+                    case 6: // Red (Z Block)
+                        ctx.fillStyle = "#ff0000";
+                        break;
+                    case 7: // Pink (T Block)
+                        ctx.fillStyle = "#b600b6";
+                        break;
+                }
+                ctx.fillRect(xGridRefToNextPieceCoordinate(j), yGridRefToNextPieceCoordinate(i), 30, 30);
+                ctx.strokeRect(xGridRefToNextPieceCoordinate(j),yGridRefToNextPieceCoordinate(i),30,30);
+            }
+
         }
     }
 }
@@ -496,22 +580,25 @@ function generateRandomBlock() {
         drawZBlock,
     ];
 
-    blockRef = Math.floor(Math.random()*arrayOfBlockFunctions.length);
-    arrayOfBlockFunctions[blockRef]();
-    copyPieceToBoard();
+    nextPiece = Math.floor(Math.random()*arrayOfBlockFunctions.length);
+    arrayOfBlockFunctions[nextPiece]();
+    copyPieceToNextPiece();
+    //    drawNextPieceBoard();
 }
 
-function testAnimate() {
+function newBlock() {
     xPosition = 7;
     yPosition = 0;
     rotation = 0;
     clearFullLines();
+    currentPiece = nextPiece;
     generateRandomBlock();
+    arrayOfBlockFunctions[currentPiece]();
 
-    mainInterval =  setInterval(testLoop, dropDelay);
+    mainInterval =  setInterval(mainLoop, dropDelay);
 }
 
-function testLoop() {
+function mainLoop() {
     prevXPosition = xPosition;
     prevYPosition = yPosition;
     prevRotation = rotation;
@@ -522,13 +609,13 @@ function testLoop() {
             gameOver();
             return;
         }
-        testAnimate();
+        newBlock();
         return;
     }
 
     yPosition++;
     clearPiece();
-    arrayOfBlockFunctions[blockRef]();
+    arrayOfBlockFunctions[currentPiece]();
     copyPieceToBoard();
     drawTetrominosOnBoard();
 }
@@ -618,20 +705,20 @@ function checkRotationCollision() {
     if (rotation == 4) {
         rotation = 0;
     }
-    arrayOfBlockFunctions[blockRef]();
+    arrayOfBlockFunctions[currentPiece]();
     if (xPosition + blockWidth > 14) {
         console.log("Rotation Collision with side");
         rotation--;
         return;
     }
-    
+
     if (yPosition + blockHeight > 20) {
         console.log("Rotation Collision with bottom");
         rotation--;
         return;
     }
-    
-    
+
+
     for (var i=0; i<pieceArray.length; i++){
         for (var j=0; j<pieceArray.length; j++) {
             if (pieceArray[i][j] != 0) {
@@ -664,6 +751,8 @@ function clearFullLines() {
             for (var l=0; l <= 13; l++) {
                 gameBoard[0].push(0);
             }
+            lineClearedSound.load();
+            lineClearedSound.play();
             drawTetrominosOnBoard();
             score += 10;
             dropDelay -= 10;
@@ -695,6 +784,30 @@ function gameOver() {
     ctx.fillText("Press the spacebar to play again",110,canvas.height/2 + 45);
     soundTrack.pause();
 
+}
+
+function pause() {
+    paused = true;
+    ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font="30px Arial";
+    ctx.fillStyle = "rgb(255,255,255)";
+    ctx.fillText("Paused",200,canvas.height/2 -30);
+    ctx.font="25px Arial";
+    ctx.fillText("Press the 'esc' key to resume",90,canvas.height/2 + 10);
+    soundTrack.pause();
+    clearInterval(mainInterval);
+}
+
+function resume() {
+    paused = false;
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    drawTopData();
+    drawGameArea();
+    drawTetrominosOnBoard();
+    mainInterval = setInterval(mainLoop, dropDelay);
+    soundTrack.play(); 
 }
 
 
