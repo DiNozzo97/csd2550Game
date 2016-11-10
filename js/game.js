@@ -722,6 +722,7 @@ function checkRotationCollision() {
 
 
 function clearFullLines() {
+    var streakCount = 0;
     for (var i=0; i<gameBoard.length; i++) {
         lineNo = i;
         completeLine = true;
@@ -741,10 +742,12 @@ function clearFullLines() {
             }
             drawTetrominosOnBoard();
             score += 10;
+            streakCount++;
             dropDelay -= 10;
-            drawTopData();
         }
-    }
+    }   
+    score += (streakCount * 5);
+    drawTopData();
 }
 
 function gameOver() {
