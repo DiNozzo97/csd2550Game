@@ -39,9 +39,9 @@ $( document ).keydown(function(event) {
             }
             // At this point, we know that the move is valid. We therefore decrease the xPosition by 1 (moving the block 1 unit to the left)
             xPosition--;
-            // Delete the current block from the gameBoard array and then clear/redraw the glaying area background
+            // Delete the current block from the gameBoard array and then clear/redraw the playing area background
             clearPiece();
-            // set the block variables to the current block
+            // get the block variables to the current block
             arrayOfBlockFunctions[currentPiece]();
             // copy the block (in it's new position) to the gameBoard array
             copyPieceToBoard();
@@ -50,65 +50,90 @@ $( document ).keydown(function(event) {
             break;
         case 87: // 'W' Key
         case 38: // Up Arrow Key
+            // If the 'W' Key or Up arrow key are pressed, see if the game is paused or in the gameover state, if it is then ignore the keypress and return.
             if (paused == true || gameOverState == true)
                 return;
+            // Otherwise store all of the current block's properties to variables, so that they can be cleared later.
             prevXPosition = xPosition;
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
             prevRotation = rotation;
+            // Clear the existing piece from the gameBoard array (so that the new rotation can be tested)
             clearPiece();
+            // Check whether the piece would be valid if rotated 90 degrees to the right (if so then rotate, otherwise leave as if)
             checkRotationCollision();
-            clearPiece();
+            //            clearPiece();
+            // get the block variables to the current block in it's correct rotation (whether new or existing)
             arrayOfBlockFunctions[currentPiece]();
+            // copy the block (in it's new position) to the gameBoard array
             copyPieceToBoard();
+            // Draw all of the blocks onto the canvas grid based on the gameBoard array
             drawTetrominosOnBoard();
             break;
         case 68: // 'D' Key
         case 39: // Right Arrow Key
+            // If the 'D' Key or Right arrow key are pressed, see if the game is paused or in the gameover state, if it is then ignore the keypress and return.
             if (paused == true || gameOverState == true)
                 return;
+            // Otherwise store all of the current block's properties to variables, so that they can be cleared later.
             prevXPosition = xPosition;
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
             prevRotation = rotation;
+            // Check to see whether the users requested move is valid (will the block collide with the side of the board or another block?), if it isn't then return.
             if (checkRightCollision() == false) {
                 return;
             }
+            // At this point, we know that the move is valid. We therefore increase the xPosition by 1 (moving the block 1 unit to the right)
             xPosition++;
+            // Delete the current block from the gameBoard array and then clear/redraw the playing area background
             clearPiece();
+            // get the block variables to the current block
             arrayOfBlockFunctions[currentPiece]();
+            // copy the block (in it's new position) to the gameBoard array
             copyPieceToBoard();
+            // Draw all of the blocks onto the canvas grid based on the gameBoard array
             drawTetrominosOnBoard();
 
             break;
         case 32: // Space bar Key
+            // if the game is in the game over state and the user presses the space bar, then start a new game and return
             if (gameOverState == true) {
                 initGame();
                 return;
             }
         case 83: // 'S' Key
         case 40: // Down Arrow Key
+            // If the 'S' Key, down arrow key, or space bar (when not in game over state) are pressed, see if the game is paused or in the gameover state, if it is then ignore the keypress and return.
             if (paused == true || gameOverState == true)
                 return;
+            // Otherwise store all of the current block's properties to variables, so that they can be cleared later.
             prevXPosition = xPosition;
             prevYPosition = yPosition;
             prevPieceArray = pieceArray;
             prevRotation = rotation;
+            // Check to see whether the users requested move is valid (has the block already landed on the bottom of the board or on another block?), if it isn't then return
             if (checkYCollision() == false) {
                 clearInterval(mainInterval);
                 newBlock();
                 return;
             }
+            // At this point, we know that the move is valid. We therefore increase the yPosition by 1 (moving the block 1 unit down)
             yPosition++;
+            // Delete the current block from the gameBoard array and then clear/redraw the playing area background
             clearPiece();
+            // get the block variables to the current block
             arrayOfBlockFunctions[currentPiece]();
+            // copy the block (in it's new position) to the gameBoard array
             copyPieceToBoard();
+            // Draw all of the blocks onto the canvas grid based on the gameBoard array
             drawTetrominosOnBoard();
             break;
-        case 80: // 'P' Key
         case 27: // Escape Key
+            // If the 'ESC' Key is pressed, check to see if it is currently game over, if it is then return
             if (gameOverState == true)
                 return;
+            // Check to see whether the game is paused. if it isn't, then pause the game, otherwise resume it
             if (paused == false) 
                 pause();
             else 
@@ -117,21 +142,28 @@ $( document ).keydown(function(event) {
     }
 });
 
-
+// The 'initGame' function is used to set default variables, and prepare/start a new game
 function initGame() {
+    // If the previous game loop is still defined (and therefore running) then stop it
     if (typeof mainInterval !== 'undefined') {
         clearInterval(mainInterval);
     }
+    // Create a variable to communicate with the HTML canvas
     canvas = document.getElementById("mainCanvas");
+    // Create a variable to access the 2D drawing methods/properties
     ctx = canvas.getContext("2d");
+    // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Set default variables
     score = 0;
     gameOverState = false;
     paused = false;
     dropDelay = 500;
+    // Draw the Top Data (name/score)
     drawTopData();
     // Create an array to represent the game board
     gameBoard = new Array();
+    // Create 20 elements in the gameBoard array (to represent rows) and within each element, create an array with 14 elements (to represent columns) and then initialise them all to 0
     for (var r=0; r<20; r++) {
         gameBoard[r] = new Array();
         for (var c=0; c<14; c++) {
@@ -139,8 +171,9 @@ function initGame() {
 
         }
     }
-
+    // Create an array to represent the next piece preview area of the game
     nextPieceBoard = new Array();
+    // Create 4 elements in the nextPieceBoard array (to represent rows) and within each element, create an array with 4 elements (to represent columns) and initialise them all to 0
     for (var r=0; r<4; r++) {
         nextPieceBoard[r] = new Array();
         for (var c=0; c<4; c++) {
@@ -148,22 +181,31 @@ function initGame() {
 
         }
     }
-
+    // Draw the game area (main game board and next block area) on to the canvas
     drawGameArea();
+    // Generate a random block to be the first 'next block'
     generateRandomBlock();
+    // use the initial 'next block' as the first actual block and randomly generate a new 'next block'
     newBlock();
 }
 
+// The 'drawGameArea' function clears the game area and redraws it.
 function drawGameArea() {
+    // Clear the canvas below the 'Top Data Bar'
     ctx.clearRect(0, 20, canvas.width, 480);
+    // Set the fill colour to black with 50% ocpacity
     ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-    // Draw area next piece panel
+    // Draw a rectangle for the next piece area
     ctx.fillRect(0, 20, 150, 170);
+    // Set the font for text
     ctx.font="15px Arial";
+    // set the colour of the text to pure black
     ctx.fillStyle = "rgb(0,0,0)";
+    // Draw the text 'Next Piece' in the next piece box 
     ctx.fillText("Next Piece:", 5, 35);
-    // Draw Main game area
+    // Set the fill colour to black with 50% ocpacity
     ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    // Draw a rectangle for the main game area
     ctx.fillRect(150, 20, 400, 500);
     // Draw Main game area vertical grid
     for (var i=150; i<550; i+=25) {
@@ -180,15 +222,19 @@ function drawGameArea() {
         ctx.lineTo(550,i);
         ctx.stroke();
     }
-
+    // draw any blocks that exist on to the main game area
     drawTetrominosOnBoard();
 
 }
-
+// The 'drawTopData' function is used to draw the data bar (name/score etc.) at the top of the canvas
 function drawTopData(){
+    // Clear the data bar
     ctx.clearRect(0, 0, canvas.width, 20);
+    // Set the font
     ctx.font="15px Arial";
+    // Set the text colour to black
     ctx.fillStyle = "rgb(0,0,0)";
+    // If the user is signed in, display their name/personal highscore/current score. Otherwise tell the user their score won't be saved and display their score.
     if (sessionStorage.signedIn == 'true')
         ctx.fillText("Name: "+sessionStorage.currentFirstName+" "+sessionStorage.currentLastName+"  Your High Score: "+sessionStorage.highScore+"      Score: "+score,5,15);
     else
@@ -196,7 +242,8 @@ function drawTopData(){
 
 }
 
-function drawIBlock() {
+// The 'get..Block' functions are used to get the properties such as layout (with each number denoting a color), width and height of a given block in a given rotation
+function getIBlock() {
     switch (rotation) {
         case 0:
         case 2:
@@ -225,7 +272,7 @@ function drawIBlock() {
     } 
 }
 
-function drawOBlock() {
+function getOBlock() {
     switch (rotation) {
         case 0 :
         case 1 :
@@ -244,7 +291,7 @@ function drawOBlock() {
     } 
 }
 
-function drawLBlock() {
+function getLBlock() {
     switch (rotation) {
         case 0 :
             blockWidth = 2;
@@ -293,7 +340,7 @@ function drawLBlock() {
     }
 }
 
-function drawJBlock() {
+function getJBlock() {
     switch (rotation) {
         case 0 :
             blockWidth = 2;
@@ -342,7 +389,7 @@ function drawJBlock() {
     }
 }
 
-function drawSBlock() {
+function getSBlock() {
     switch (rotation) {
         case 0 :
         case 2 :
@@ -371,7 +418,7 @@ function drawSBlock() {
     }
 }
 
-function drawZBlock() {
+function getZBlock() {
     switch (rotation) {
         case 0 :
         case 2 :
@@ -400,7 +447,7 @@ function drawZBlock() {
     }
 }
 
-function drawTBlock() {
+function getTBlock() {
     switch (rotation) {
         case 0 :
             blockWidth  = 3;
@@ -449,29 +496,34 @@ function drawTBlock() {
     }
 }
 
+// The 'xGridRefToGameBoardCoordinate' function will take a main board area x grid reference and will return the corresponding canvas x co-ordinate
 function xGridRefToGameBoardCoordinate (xGridRef) {
     xCoordinate = 150 + (xGridRef * 25);
     return xCoordinate;
 }
 
+// The 'yGridRefToGameBoardCoordinate' function will take a main board area y grid reference and will return the corresponding canvas y co-ordinate
 function yGridRefToGameBoardCoordinate (yGridRef) {
     yCoordinate = 20 + (yGridRef * 25);
     return yCoordinate;
 }
 
+// The 'xGridRefToNextPieceCoordinate' function will take a next piece area x grid reference and will return the corresponding canvas x co-ordinate
 function xGridRefToNextPieceCoordinate (xGridRef) {
     xCoordinate = 35 + (xGridRef * 30);
     return xCoordinate;
 }
 
+// The 'yGridRefToNextPieceCoordinate' function will take a next piece area y grid reference and will return the corresponding canvas y co-ordinate
 function yGridRefToNextPieceCoordinate (yGridRef) {
     yCoordinate = 60 + (yGridRef * 30);
     return yCoordinate;
 }
 
+// The 'copyPieceToBoard' function copies every ocupied square of a block in to the 'gameBoard' array at the currently set X/Y Positions
 function copyPieceToBoard(){
     for (var i=0; i<pieceArray.length; i++){
-        for (var j=0; j<pieceArray.length; j++) {
+        for (var j=0; j<pieceArray[0].length; j++) {
             if (pieceArray[i][j] != 0)
                 gameBoard[yPosition+i][xPosition+j] = pieceArray[i][j];
 
@@ -479,11 +531,7 @@ function copyPieceToBoard(){
     }
 }
 
-function copyPieceToNextPiece(){
-    nextPieceBoard = pieceArray;
-}
-
-
+// The 'drawTetrominosOnBoard' function loops through the 'gameBoard' and 'nextPieceBoard' arrays and draws any non 0 values on to the relevant board in the form of squares, with black borders in the colour represented by the number in the array, on to the canvas
 function drawTetrominosOnBoard() {
     for (var i=0; i<20; i++){
         for (var j=0; j<14; j++) {
@@ -517,10 +565,9 @@ function drawTetrominosOnBoard() {
         }
     }
 
-    for (var i=0; i<4; i++){
-        for (var j=0; j<4; j++) {
+    for (var i=0; i<nextPieceBoard.length; i++){
+        for (var j=0; j<nextPieceBoard[0].length; j++) {
             if (nextPieceBoard[i][j] != 0) {
-
                 switch (nextPieceBoard[i][j]){
                     case 1: // Cyan (I Block)
                         ctx.fillStyle = "#00FFFF";
@@ -552,6 +599,7 @@ function drawTetrominosOnBoard() {
     }
 }
 
+// The 'clearPiece' function will delete the second most recently block from the 'gameBoard' array by substituting it's pattern with 0s, and then clears the canvas below the top data bar and draws a blank game area
 function clearPiece() {
     for (var i=0; i<prevPieceArray.length; i++){
         for (j=0; j<prevPieceArray.length; j++) {
@@ -564,23 +612,24 @@ function clearPiece() {
     drawGameArea();
 }
 
+// The 'generateRandomBlock' function selects a random block, stores it's reference, gets it's properties and sets the 'nextPieceBoard' to the selected block
 function generateRandomBlock() {
     arrayOfBlockFunctions = [
-        drawIBlock,
-        drawJBlock,
-        drawLBlock,
-        drawOBlock,
-        drawSBlock,
-        drawTBlock,
-        drawZBlock,
+        getIBlock,
+        getJBlock,
+        getLBlock,
+        getOBlock,
+        getSBlock,
+        getTBlock,
+        getZBlock,
     ];
 
     nextPiece = Math.floor(Math.random()*arrayOfBlockFunctions.length);
     arrayOfBlockFunctions[nextPiece]();
-    copyPieceToNextPiece();
-    //    drawNextPieceBoard();
+    nextPieceBoard = pieceArray;
 }
 
+// The 'newBlock' function resets the X/Y positions and rotation variables back to default, clears any full lines in the game, generates a new random next piece and gets the properties of the new current piece (previously the next piece). It then starts the main drop interval which occurs at an interval
 function newBlock() {
     xPosition = 7;
     yPosition = 0;
@@ -590,84 +639,99 @@ function newBlock() {
     generateRandomBlock();
     arrayOfBlockFunctions[currentPiece]();
 
-    mainInterval =  setInterval(mainLoop, dropDelay);
+    mainInterval =  setInterval(dropBlock, dropDelay);
 }
 
-function mainLoop() {
+// The 'dropBlock' function is used to drop the block by 1 unit each time it is called, using an interval
+function dropBlock() {
+    // Store the current position/block settings
     prevXPosition = xPosition;
     prevYPosition = yPosition;
     prevRotation = rotation;
     prevPieceArray = pieceArray
+    // Check to see if there would be a collision if the block moved down 1 unit
     if (checkYCollision() == false) {
+        // if there is then stop the interval calls to 'dropBlock'
         clearInterval(mainInterval);
+        // and check to see if the collision is at the top of the board then call 'gameOver' and return
         if (yPosition == 0) {
             gameOver();
             return;
         }
+        // if there is a collision but not at the top of the board, then generate a 'newBlock'
         newBlock();
         return;
     }
-
+    // if there is no collision, increment the Y position by 1
     yPosition++;
+    // clear the block from it's previous position in the 'gameBoard' array and clear the game area
     clearPiece();
+    // get the properties of the current block
     arrayOfBlockFunctions[currentPiece]();
+    // Copy the block to the 'gameBoard' array in it's new position
     copyPieceToBoard();
+    // draw all of the blocks on to the game area, acording to the 'gameBoard' array
     drawTetrominosOnBoard();
 }
 
+// The 'checkYCollision' checks to see whether it is valid for the current block to move down on the board
 function checkYCollision() {
-    bottomEdges = [];
+    // Set variables
+    var bottomEdges = [];
     var tempBottom = [];
-    for (var i=0; i<pieceArray.length; i++) {
-        for (var j=0; j<pieceArray.length; j++) {
-            if (pieceArray[j][i] != 0){
-                tempBottom = [yPosition+j,xPosition+i];
+    for (var i=0; i<pieceArray.length; i++) { // for each column
+        for (var j=0; j<pieceArray.length; j++) { // for each row
+            if (pieceArray[j][i] != 0){ // if the value is not a 0
+                tempBottom = [yPosition+j,xPosition+i]; // set tempBottom to it's current grid reference
             }
-        }
-        if (bottomEdges[bottomEdges.length-1] != tempBottom)
-            bottomEdges.push(tempBottom);
+        } // after each column
+        if (bottomEdges[bottomEdges.length-1] != tempBottom) // if the last grid reference hasn't already been added to bottomEdges
+            bottomEdges.push(tempBottom); // then add it to the array
     }
-    for (var i=0; i<bottomEdges.length; i++) { // Bottom of the board
-        if (bottomEdges[i][0] + 1 > 19) {
-            return false;
+    for (var i=0; i<bottomEdges.length; i++) { // For each bottom edge
+        if (bottomEdges[i][0] + 1 > 19) { // if adding 1 to the y value brings it over 19 (the height of the board)
+            return false; // then return false
         }
-        else if (gameBoard[bottomEdges[i][0] + 1][bottomEdges[i][1]] != 0) { // Another tile
-            return false;
+        else if (gameBoard[bottomEdges[i][0] + 1][bottomEdges[i][1]] != 0) { // Otherwise, if moving down collides with another block (non 0 value)
+            return false; // then return false
         }
     }
-    return true;
+    return true; // Otherwise, if the checks have all passed, then return true
 
 }
 
+// The 'checkLeftCollision' checks to see whether it is valid for the current block to move left on the board
 function checkLeftCollision() {
-    leftEdges = [];
-    var tempLeft = [];
-    for (var i=0; i<pieceArray.length; i++) {
-        leftFound = false;
-        for (var j=0; j<pieceArray.length; j++) {
-            if (pieceArray[i][j] != 0 && leftFound == false){
-                tempLeft =  [yPosition+i,xPosition+j];
-                leftFound = true;
+    // Set variables
+    var leftEdges = [];
+    var tempLeft;
+    for (var i=0; i<pieceArray.length; i++) { // For each row of pieceArray
+        var leftFound = false; // Set leftFound as false
+        for (var j=0; j<pieceArray.length; j++) { // for each column
+            if (pieceArray[i][j] != 0 && leftFound == false){ // if there is a non 0 value (a part of the block) and left hasn't been found
+                tempLeft =  [yPosition+i,xPosition+j]; // Store the position as 'tempLeft'
+                leftFound = true; // Set leftFound to true
             }
-        }
-        if (leftEdges[leftEdges.length-1] != tempLeft)
-            leftEdges.push(tempLeft);
+        } // After each row
+        if (leftEdges[leftEdges.length-1] != tempLeft) // if the last grid reference hasn't already been added to leftEdges
+            leftEdges.push(tempLeft); // add 'tempLeft' to 'leftEdges'
     }
 
-    for (var i=0; i<leftEdges.length; i++) { // Side of the board
-        if (leftEdges[i][1] - 1 < 0) {
-            return false;
+    for (var i=0; i<leftEdges.length; i++) { // for each leftEdge
+        if (leftEdges[i][1] - 1 < 0) { // if decreasing the x value by 1 makes it less than 0 (It will move off the board)
+            return false; // then eturn false
         }
-        else if (gameBoard[leftEdges[i][0]][leftEdges[i][1] - 1 ] != 0) { // Another tile
-            return false;
+        else if (gameBoard[leftEdges[i][0]][leftEdges[i][1] - 1 ] != 0) { // Otherwise, if decreasing the x value by 1 is already occupied by another block
+                                                                          // (non 0 number)
+            return false; // then return false
         }
     }
-    return true;
+    return true; // Otherwise, it has passed the check and returns true
 
 }
 
 function checkRightCollision() {
-    rightEdges = [];
+    var rightEdges = [];
     var tempRight = [];
     for (var i=0; i<pieceArray.length; i++) {
         for (var j=0; j<pieceArray.length; j++) {
@@ -746,7 +810,8 @@ function clearFullLines() {
             dropDelay -= 10;
         }
     }   
-    score += (streakCount * 5);
+    if (streakCount > 1)
+        score += (streakCount * 5);
     drawTopData();
 }
 
@@ -792,7 +857,7 @@ function resume() {
     drawTopData();
     drawGameArea();
     drawTetrominosOnBoard();
-    mainInterval = setInterval(mainLoop, dropDelay);
+    mainInterval = setInterval(dropBlock, dropDelay);
 }
 
 
