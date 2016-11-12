@@ -674,7 +674,7 @@ function dropBlock() {
     drawTetrominosOnBoard();
 }
 
-// The 'checkYCollision' checks to see whether it is valid for the current block to move down on the board
+// The 'checkYCollision' function checks to see whether it is valid for the current block to move down on the board
 function checkYCollision() {
     // Set variables
     var bottomEdges = [];
@@ -700,7 +700,7 @@ function checkYCollision() {
 
 }
 
-// The 'checkLeftCollision' checks to see whether it is valid for the current block to move left on the board
+// The 'checkLeftCollision' function checks to see whether it is valid for the current block to move left on the board
 function checkLeftCollision() {
     // Set variables
     var leftEdges = [];
@@ -730,134 +730,139 @@ function checkLeftCollision() {
 
 }
 
+// The 'checkRightCollision' function checks to see whether it is valid for the current block to move right on the board 
 function checkRightCollision() {
+    // Set variables
     var rightEdges = [];
     var tempRight = [];
-    for (var i=0; i<pieceArray.length; i++) {
-        for (var j=0; j<pieceArray.length; j++) {
-            if (pieceArray[i][j] != 0){
-                tempRight =  [yPosition+i,xPosition+j];
+    for (var i=0; i<pieceArray.length; i++) { // For each row of pieceArray
+        for (var j=0; j<pieceArray.length; j++) { // for each column
+            if (pieceArray[i][j] != 0){ // If there is a non 0 value
+                tempRight =  [yPosition+i,xPosition+j]; // Svae it as the tempRight edge
             }
         }
-        if (rightEdges[rightEdges.length-1] != tempRight)
-            rightEdges.push(tempRight);
+        if (rightEdges[rightEdges.length-1] != tempRight) // If the right edge of the row hasn't already been added to 'rightEdges'
+            rightEdges.push(tempRight); // then push the 'tempRight' (right most piece of a row) to rightEdges
     }
 
-    for (var i=0; i<rightEdges.length; i++) { // Side of the board
-        if (rightEdges[i][1] + 1 > 13) {
-            return false;
+    for (var i=0; i<rightEdges.length; i++) { // for each position in 'rightEdges'
+        if (rightEdges[i][1] + 1 > 13) { // check to see whether if we were to move each right most edge to the right by 1, it's xPosition is greater than 13 (edge of the board)
+            return false; // If so, then return false
         }
-        else if (gameBoard[rightEdges[i][0]][rightEdges[i][1] + 1 ] != 0) { // Another tile
-            return false;
+        else if (gameBoard[rightEdges[i][0]][rightEdges[i][1] + 1 ] != 0) { // check to see whether if we were to move each right most edge to the right by 1, it would collide with any tiles (non 0 values) that already reside in the array
+            return false; // If so, then return false
         }
     }
-    return true;
+    return true; // Otherwise if the move is valid then return true
 
 }
 
+// The 'checkRotationCollision' function is used to test whether it would be a valid move for the current piece to rotate 90 degrees to the right
 function checkRotationCollision() {
-    rotation++;
-    if (rotation == 4) {
-        rotation = 0;
+    rotation++; // Increase the rotation value by 1 (so it is now the value to be tested)
+    if (rotation == 4) { // If the rotation value is 4 i.e. a 360 degree rotation of the original block
+        rotation = 0; // Then set rotation to 0
     }
-    arrayOfBlockFunctions[currentPiece]();
-    if (xPosition + blockWidth > 14) {
-        rotation--;
-        return;
-    }
-
-    if (yPosition + blockHeight > 20) {
-        rotation--;
-        return;
+    arrayOfBlockFunctions[currentPiece](); // get the block properties of the new rotation
+    if (xPosition + blockWidth > 14) { // if the current x position + the width of the block is more than 14 (off the bozrd)
+        rotation--; // Then put the block back to it's original rotation
+        return; // and return
     }
 
+    if (yPosition + blockHeight > 20) { // if the block height + y position is greater than 20 (height of the board)
+        rotation--; // Then put the block back to it's original rotation
+        return; // and return
+    }
 
-    for (var i=0; i<pieceArray.length; i++){
-        for (var j=0; j<pieceArray.length; j++) {
-            if (pieceArray[i][j] != 0) {
-                if (gameBoard[yPosition+i][xPosition+j] != 0) {
-                    rotation--;
-                    return;
+
+    for (var i=0; i<pieceArray.length; i++){ // for each row in 'pieceArray'
+        for (var j=0; j<pieceArray.length; j++) { // for each column
+            if (pieceArray[i][j] != 0) { // if the value is a part of the block (non 0 element)
+                if (gameBoard[yPosition+i][xPosition+j] != 0) { // If it would collide with an existing block when rotated
+                    rotation--; // Revert the block to it's original rotation
+                    return; // return
                 }
             }
         }
     }
 }
 
-
+// The 'clearFullLines' function is used to clear any complete lines from the board and increase score accordingly
 function clearFullLines() {
-    var streakCount = 0;
-    for (var i=0; i<gameBoard.length; i++) {
-        lineNo = i;
-        completeLine = true;
-        for (var j=0; j<gameBoard[1].length; j++) {
-            if (gameBoard[i][j] == 0){
-                completeLine = false;
+    var streakCount = 0; // Variable used to store the streak (number of lines completed in 1 move)
+    for (var i=0; i<gameBoard.length; i++) { // For each row of the 'gameBoard'
+        completeLine = true; // default to complete line
+        for (var j=0; j<gameBoard[1].length; j++) { // For each column
+            if (gameBoard[i][j] == 0){ // if there is a 0
+                completeLine = false; // Then is is not a complete line and completeLine is set to false
             }
         }
-        if (completeLine == true) {
-            tempGameBoard = gameBoard.slice(0);
-            for (var k=1; k<=i; k++) {
-                gameBoard[k] = tempGameBoard[k-1];
+        if (completeLine == true) { // If the line is a complete line
+            tempGameBoard = gameBoard.slice(0); // Copy the gameBoard to a new variable
+            for (var k=1; k<=i; k++) { // For each row up to the completed line
+                gameBoard[k] = tempGameBoard[k-1]; // Shift the line down by 1 row
             }
-            gameBoard[0] = [];
-            for (var l=0; l <= 13; l++) {
-                gameBoard[0].push(0);
+            gameBoard[0] = []; // prepare the new top line
+            for (var l=0; l <= 13; l++) { // For each column
+                gameBoard[0].push(0); // Fill with a 0
             }
-            drawTetrominosOnBoard();
-            score += 10;
-            streakCount++;
-            dropDelay -= 10;
+            drawTetrominosOnBoard(); // Redraw the Blocks, in order to show the new block layout
+            score += 10; // Add 10 to the users current score
+            streakCount++; // Increment the 'streakCount'
+            dropDelay -= 10; // Increase the speed of the blocks dropping, by 10 ms
         }
     }   
-    if (streakCount > 1)
-        score += (streakCount * 5);
-    drawTopData();
+    if (streakCount > 1) // if the 'streakCount' is more than 1
+        score += (streakCount * 5); // Add an additional bonus to the score of 5 times streakCount
+    drawTopData(); // Redraw the top row data (In order to update the score displayed to the user)
 }
 
+// The function 'gameOver' is called when the user looses the game
 function gameOver() {
-    if (sessionStorage.signedIn == "true") {
-        if (sessionStorage.currentPostToScores == "true" && score > 0)
-            saveScore(score);
-        if (score > sessionStorage.highScore) {
-            sessionStorage.highScore = score;
-            usersObj = JSON.parse(localStorage.users)
-            usersObj[sessionStorage.currentArrayPosition].highScore = score
+    if (sessionStorage.signedIn == "true") { // If there is currently a user signed in
+        if (sessionStorage.currentPostToScores == "true" && score > 0) // if the user has selected too post scores and there is a score greater than 0
+            saveScore(score); // Save the users score to the HighScore table
+        if (score > sessionStorage.highScore) { // If the user has set a new personal high score
+            sessionStorage.highScore = score; // set the session variable: highScore to the new score
+            usersObj = JSON.parse(localStorage.users); //Parse the 'users' JSON string into a Javascript Object
+            usersObj[sessionStorage.currentArrayPosition].highScore = score; // Change the current users high score in tbe Javascript Object
+            localStorage.users = JSON.stringify(usersObj); // Convert the Javascript object bsck to JSON and save in local storage
         }
     }
-    gameOverState = true;
-    ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    gameOverState = true; // Set the gameOver state to true
+    ctx.fillStyle = "rgba(0, 0, 0, 0.8)"; // Set the colour (for the next item drawn) to black at 80% opacity
+    ctx.fillRect(0, 0, canvas.width, canvas.height); // Draw a rectangle over the entire canvas
 
-    ctx.font="75px Arial";
-    ctx.fillStyle = "rgb(255,255,255)";
-    ctx.fillText("Game Over",50,canvas.height/2 -30);
-    ctx.font="35px Arial";
-    ctx.fillText("Score: "+score,190,canvas.height/2 + 10);
-    ctx.font="20px Arial";
-    ctx.fillText("Press the spacebar to play again",110,canvas.height/2 + 45);
+    ctx.font="75px Arial"; // Set the font
+    ctx.fillStyle = "rgb(255,255,255)"; // Set the colour to white
+    ctx.fillText("Game Over",50,canvas.height/2 -30); // Draw the words game over in the centre of the screen
+    ctx.font="35px Arial"; // Set the font (smaller)
+    ctx.fillText("Score: "+score,190,canvas.height/2 + 10); // Write the users score on the screen
+    ctx.font="20px Arial";  // Set the font (smaller)
+    ctx.fillText("Press the spacebar to play again",110,canvas.height/2 + 45); // Write the instructions for the user to use the spacebar to restart the game
 
 }
 
+// The 'pause' function is used to pause the game
 function pause() {
-    paused = true;
-    ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font="30px Arial";
-    ctx.fillStyle = "rgb(255,255,255)";
-    ctx.fillText("Paused",200,canvas.height/2 -30);
-    ctx.font="25px Arial";
-    ctx.fillText("Press the 'esc' key to resume",90,canvas.height/2 + 10);
-    clearInterval(mainInterval);
+    paused = true; // Set paused to true
+    ctx.fillStyle = "rgba(0, 0, 0, 0.8)"; // Set the colour to black at 80% opacity
+    ctx.fillRect(0, 0, canvas.width, canvas.height); // Draw a rectanglw over the entire screen
+    ctx.font="30px Arial"; // Set the font
+    ctx.fillStyle = "rgb(255,255,255)"; // Set the colour to white
+    ctx.fillText("Paused",200,canvas.height/2 -30); // Draw the word 'paused' to the canvas
+    ctx.font="25px Arial"; // Set the font (smaller)
+    ctx.fillText("Press the 'esc' key to resume",90,canvas.height/2 + 10); // Write the instructions for the user to use the 'esc' key to resume the game
+    clearInterval(mainInterval); // Stop the main game loop from automatically dropping the block
 }
 
+// The 'resume' function is used to resume the game after it has been paused
 function resume() {
-    paused = false;
-    ctx.clearRect(0,0,canvas.width, canvas.height);
-    drawTopData();
-    drawGameArea();
-    drawTetrominosOnBoard();
-    mainInterval = setInterval(dropBlock, dropDelay);
+    paused = false; // Set paused to true
+    ctx.clearRect(0,0,canvas.width, canvas.height); // Clear the entire canvas
+    drawTopData(); // Redraw the top data bar
+    drawGameArea(); // Redraw the game board/blocks
+    mainInterval = setInterval(dropBlock, dropDelay); // restart the main game loop, automatically dropping the block
 }
 
 

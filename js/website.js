@@ -524,10 +524,10 @@ $( document ).ready(function() {
         checkLoginStatus();
         $('.alert').hide();
         alertActivator("main", "success", "You have successfully signed out!", true);
-        // Redraw the top data to show the users stats
+        // Restart the game
         initGame();
     });
-    // When the each button is pressed ->  add 'active' class and remove 'active' class from other buttons
+    // When the each button is pressed ->  add 'active' class and remove 'active' class from other buttons and Pause tbe game if a modal is opened
     $( "#playButton" ).click(function() {
         activateNavButton("playButton");
     });

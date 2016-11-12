@@ -32,6 +32,7 @@ echo "<html>";
         echo "<nav class='navbar navbar-default'>";
             echo "<div class='container-fluid'>";
                 echo "<div class='navbar-header'>";
+                    // Display Logo
                     echo "<a class='navbar-brand' href='#'><img id='logo' src='./img/logo-small-static.gif' alt='Tetris Logo'></a>";
                 echo "</div>";
 
