@@ -722,7 +722,7 @@ function checkLeftCollision() {
             return false; // then eturn false
         }
         else if (gameBoard[leftEdges[i][0]][leftEdges[i][1] - 1 ] != 0) { // Otherwise, if decreasing the x value by 1 is already occupied by another block
-                                                                          // (non 0 number)
+            // (non 0 number)
             return false; // then return false
         }
     }
@@ -785,84 +785,89 @@ function checkRotationCollision() {
             }
         }
     }
-}
 
-// The 'clearFullLines' function is used to clear any complete lines from the board and increase score accordingly
-function clearFullLines() {
-    var streakCount = 0; // Variable used to store the streak (number of lines completed in 1 move)
-    for (var i=0; i<gameBoard.length; i++) { // For each row of the 'gameBoard'
-        completeLine = true; // default to complete line
-        for (var j=0; j<gameBoard[1].length; j++) { // For each column
-            if (gameBoard[i][j] == 0){ // if there is a 0
-                completeLine = false; // Then is is not a complete line and completeLine is set to false
-            }
-        }
-        if (completeLine == true) { // If the line is a complete line
-            tempGameBoard = gameBoard.slice(0); // Copy the gameBoard to a new variable
-            for (var k=1; k<=i; k++) { // For each row up to the completed line
-                gameBoard[k] = tempGameBoard[k-1]; // Shift the line down by 1 row
-            }
-            gameBoard[0] = []; // prepare the new top line
-            for (var l=0; l <= 13; l++) { // For each column
-                gameBoard[0].push(0); // Fill with a 0
-            }
-            drawTetrominosOnBoard(); // Redraw the Blocks, in order to show the new block layout
-            score += 10; // Add 10 to the users current score
-            streakCount++; // Increment the 'streakCount'
-            dropDelay -= 10; // Increase the speed of the blocks dropping, by 10 ms
-        }
-    }   
-    if (streakCount > 1) // if the 'streakCount' is more than 1
-        score += (streakCount * 5); // Add an additional bonus to the score of 5 times streakCount
-    drawTopData(); // Redraw the top row data (In order to update the score displayed to the user)
-}
-
-// The function 'gameOver' is called when the user looses the game
-function gameOver() {
-    if (sessionStorage.signedIn == "true") { // If there is currently a user signed in
-        if (sessionStorage.currentPostToScores == "true" && score > 0) // if the user has selected too post scores and there is a score greater than 0
-            saveScore(score); // Save the users score to the HighScore table
-        if (score > sessionStorage.highScore) { // If the user has set a new personal high score
-            sessionStorage.highScore = score; // set the session variable: highScore to the new score
-            usersObj = JSON.parse(localStorage.users); //Parse the 'users' JSON string into a Javascript Object
-            usersObj[sessionStorage.currentArrayPosition].highScore = score; // Change the current users high score in tbe Javascript Object
-            localStorage.users = JSON.stringify(usersObj); // Convert the Javascript object bsck to JSON and save in local storage
-        }
+    if (checkYCollision() == false) { // If when the line moves down there will be a collision
+        rotation--;  // Revert the block to it's original rotation
+        return; // return
     }
-    gameOverState = true; // Set the gameOver state to true
-    ctx.fillStyle = "rgba(0, 0, 0, 0.8)"; // Set the colour (for the next item drawn) to black at 80% opacity
-    ctx.fillRect(0, 0, canvas.width, canvas.height); // Draw a rectangle over the entire canvas
-
-    ctx.font="75px Arial"; // Set the font
-    ctx.fillStyle = "rgb(255,255,255)"; // Set the colour to white
-    ctx.fillText("Game Over",50,canvas.height/2 -30); // Draw the words game over in the centre of the screen
-    ctx.font="35px Arial"; // Set the font (smaller)
-    ctx.fillText("Score: "+score,190,canvas.height/2 + 10); // Write the users score on the screen
-    ctx.font="20px Arial";  // Set the font (smaller)
-    ctx.fillText("Press the spacebar to play again",110,canvas.height/2 + 45); // Write the instructions for the user to use the spacebar to restart the game
-
 }
 
-// The 'pause' function is used to pause the game
-function pause() {
-    paused = true; // Set paused to true
-    ctx.fillStyle = "rgba(0, 0, 0, 0.8)"; // Set the colour to black at 80% opacity
-    ctx.fillRect(0, 0, canvas.width, canvas.height); // Draw a rectanglw over the entire screen
-    ctx.font="30px Arial"; // Set the font
-    ctx.fillStyle = "rgb(255,255,255)"; // Set the colour to white
-    ctx.fillText("Paused",200,canvas.height/2 -30); // Draw the word 'paused' to the canvas
-    ctx.font="25px Arial"; // Set the font (smaller)
-    ctx.fillText("Press the 'esc' key to resume",90,canvas.height/2 + 10); // Write the instructions for the user to use the 'esc' key to resume the game
-    clearInterval(mainInterval); // Stop the main game loop from automatically dropping the block
-}
+    // The 'clearFullLines' function is used to clear any complete lines from the board and increase score accordingly
+    function clearFullLines() {
+        var streakCount = 0; // Variable used to store the streak (number of lines completed in 1 move)
+        for (var i=0; i<gameBoard.length; i++) { // For each row of the 'gameBoard'
+            completeLine = true; // default to complete line
+            for (var j=0; j<gameBoard[1].length; j++) { // For each column
+                if (gameBoard[i][j] == 0){ // if there is a 0
+                    completeLine = false; // Then is is not a complete line and completeLine is set to false
+                }
+            }
+            if (completeLine == true) { // If the line is a complete line
+                tempGameBoard = gameBoard.slice(0); // Copy the gameBoard to a new variable
+                for (var k=1; k<=i; k++) { // For each row up to the completed line
+                    gameBoard[k] = tempGameBoard[k-1]; // Shift the line down by 1 row
+                }
+                gameBoard[0] = []; // prepare the new top line
+                for (var l=0; l <= 13; l++) { // For each column
+                    gameBoard[0].push(0); // Fill with a 0
+                }
+                drawTetrominosOnBoard(); // Redraw the Blocks, in order to show the new block layout
+                score += 10; // Add 10 to the users current score
+                streakCount++; // Increment the 'streakCount'
+                dropDelay -= 10; // Increase the speed of the blocks dropping, by 10 ms
+            }
+        }   
+        if (streakCount > 1) // if the 'streakCount' is more than 1
+            score += (streakCount * 5); // Add an additional bonus to the score of 5 times streakCount
+        drawTopData(); // Redraw the top row data (In order to update the score displayed to the user)
+    }
 
-// The 'resume' function is used to resume the game after it has been paused
-function resume() {
-    paused = false; // Set paused to true
-    ctx.clearRect(0,0,canvas.width, canvas.height); // Clear the entire canvas
-    drawTopData(); // Redraw the top data bar
-    drawGameArea(); // Redraw the game board/blocks
-    mainInterval = setInterval(dropBlock, dropDelay); // restart the main game loop, automatically dropping the block
-}
+    // The function 'gameOver' is called when the user looses the game
+    function gameOver() {
+        if (sessionStorage.signedIn == "true") { // If there is currently a user signed in
+            if (sessionStorage.currentPostToScores == "true" && score > 0) // if the user has selected too post scores and there is a score greater than 0
+                saveScore(score); // Save the users score to the HighScore table
+            if (score > sessionStorage.highScore) { // If the user has set a new personal high score
+                sessionStorage.highScore = score; // set the session variable: highScore to the new score
+                usersObj = JSON.parse(localStorage.users); //Parse the 'users' JSON string into a Javascript Object
+                usersObj[sessionStorage.currentArrayPosition].highScore = score; // Change the current users high score in tbe Javascript Object
+                localStorage.users = JSON.stringify(usersObj); // Convert the Javascript object bsck to JSON and save in local storage
+            }
+        }
+        gameOverState = true; // Set the gameOver state to true
+        ctx.fillStyle = "rgba(0, 0, 0, 0.8)"; // Set the colour (for the next item drawn) to black at 80% opacity
+        ctx.fillRect(0, 0, canvas.width, canvas.height); // Draw a rectangle over the entire canvas
+
+        ctx.font="75px Arial"; // Set the font
+        ctx.fillStyle = "rgb(255,255,255)"; // Set the colour to white
+        ctx.fillText("Game Over",50,canvas.height/2 -30); // Draw the words game over in the centre of the screen
+        ctx.font="35px Arial"; // Set the font (smaller)
+        ctx.fillText("Score: "+score,190,canvas.height/2 + 10); // Write the users score on the screen
+        ctx.font="20px Arial";  // Set the font (smaller)
+        ctx.fillText("Press the spacebar to play again",110,canvas.height/2 + 45); // Write the instructions for the user to use the spacebar to restart the game
+
+    }
+
+    // The 'pause' function is used to pause the game
+    function pause() {
+        paused = true; // Set paused to true
+        ctx.fillStyle = "rgba(0, 0, 0, 0.8)"; // Set the colour to black at 80% opacity
+        ctx.fillRect(0, 0, canvas.width, canvas.height); // Draw a rectanglw over the entire screen
+        ctx.font="30px Arial"; // Set the font
+        ctx.fillStyle = "rgb(255,255,255)"; // Set the colour to white
+        ctx.fillText("Paused",200,canvas.height/2 -30); // Draw the word 'paused' to the canvas
+        ctx.font="25px Arial"; // Set the font (smaller)
+        ctx.fillText("Press the 'esc' key to resume",90,canvas.height/2 + 10); // Write the instructions for the user to use the 'esc' key to resume the game
+        clearInterval(mainInterval); // Stop the main game loop from automatically dropping the block
+    }
+
+    // The 'resume' function is used to resume the game after it has been paused
+    function resume() {
+        paused = false; // Set paused to true
+        ctx.clearRect(0,0,canvas.width, canvas.height); // Clear the entire canvas
+        drawTopData(); // Redraw the top data bar
+        drawGameArea(); // Redraw the game board/blocks
+        mainInterval = setInterval(dropBlock, dropDelay); // restart the main game loop, automatically dropping the block
+    }
 
 

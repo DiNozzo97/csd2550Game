@@ -534,16 +534,19 @@ $( document ).ready(function() {
     $( "#scoresButton" ).click(function() {
         activateNavButton("scoresButton");
         displayScores();
-        pause();
+        if (gameOverState == false)
+            pause();
     });
     $( "#guestNavButton" ).click(function() {
         activateNavButton("guestNavButton");
-        pause();
+        if (gameOverState == false)
+            pause();
     });
     $( "#settingsButton" ).click(function() {
         activateNavButton("signedInNavButton");
         resetSettings();
-        pause();
+        if (gameOverState == false)
+            pause();
     });
 
     // When the sign in/scores/settings modal is closed, make play active again
