@@ -43,7 +43,7 @@ $( document ).keydown(function(event) {
             clearPiece();
             // get the block variables to the current block
             arrayOfBlockFunctions[currentPiece]();
-            // copy the block (in it's new position) to the gameBoard array
+            // copy the block (in its new position) to the gameBoard array
             copyPieceToBoard();
             // Draw all of the blocks onto the canvas grid based on the gameBoard array
             drawTetrominosOnBoard();
@@ -63,7 +63,7 @@ $( document ).keydown(function(event) {
             // Check whether the piece would be valid if rotated 90 degrees to the right (if so then rotate, otherwise leave as if)
             checkRotationCollision();
             //            clearPiece();
-            // get the block variables to the current block in it's correct rotation (whether new or existing)
+            // get the block variables to the current block in its correct rotation (whether new or existing)
             arrayOfBlockFunctions[currentPiece]();
             // copy the block (in it's new position) to the gameBoard array
             copyPieceToBoard();
@@ -90,7 +90,7 @@ $( document ).keydown(function(event) {
             clearPiece();
             // get the block variables to the current block
             arrayOfBlockFunctions[currentPiece]();
-            // copy the block (in it's new position) to the gameBoard array
+            // copy the block (in its new position) to the gameBoard array
             copyPieceToBoard();
             // Draw all of the blocks onto the canvas grid based on the gameBoard array
             drawTetrominosOnBoard();
@@ -124,7 +124,7 @@ $( document ).keydown(function(event) {
             clearPiece();
             // get the block variables to the current block
             arrayOfBlockFunctions[currentPiece]();
-            // copy the block (in it's new position) to the gameBoard array
+            // copy the block (in its new position) to the gameBoard array
             copyPieceToBoard();
             // Draw all of the blocks onto the canvas grid based on the gameBoard array
             drawTetrominosOnBoard();
@@ -612,7 +612,7 @@ function clearPiece() {
     drawGameArea();
 }
 
-// The 'generateRandomBlock' function selects a random block, stores it's reference, gets it's properties and sets the 'nextPieceBoard' to the selected block
+// The 'generateRandomBlock' function selects a random block, stores its reference, gets its properties and sets the 'nextPieceBoard' to the selected block
 function generateRandomBlock() {
     arrayOfBlockFunctions = [
         getIBlock,
@@ -664,11 +664,11 @@ function dropBlock() {
     }
     // if there is no collision, increment the Y position by 1
     yPosition++;
-    // clear the block from it's previous position in the 'gameBoard' array and clear the game area
+    // clear the block from its previous position in the 'gameBoard' array and clear the game area
     clearPiece();
     // get the properties of the current block
     arrayOfBlockFunctions[currentPiece]();
-    // Copy the block to the 'gameBoard' array in it's new position
+    // Copy the block to the 'gameBoard' array in its new position
     copyPieceToBoard();
     // draw all of the blocks on to the game area, acording to the 'gameBoard' array
     drawTetrominosOnBoard();
@@ -682,7 +682,7 @@ function checkYCollision() {
     for (var i=0; i<pieceArray.length; i++) { // for each column
         for (var j=0; j<pieceArray.length; j++) { // for each row
             if (pieceArray[j][i] != 0){ // if the value is not a 0
-                tempBottom = [yPosition+j,xPosition+i]; // set tempBottom to it's current grid reference
+                tempBottom = [yPosition+j,xPosition+i]; // set tempBottom to its current grid reference
             }
         } // after each column
         if (bottomEdges[bottomEdges.length-1] != tempBottom) // if the last grid reference hasn't already been added to bottomEdges
