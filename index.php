@@ -132,6 +132,12 @@
                         <input type="password" class="form-control text-center settings" id="passwordSettings" placeholder="Password">
                         <input type="password" class="form-control text-center settings" id="confirmPasswordSettings" placeholder="Confirm Password">
                     </div><!-- /.passwordSettingsGroup -->
+                    <div id="phoneNumberSettingsGroup" class="form-group">
+                        <input type="text" class="form-control text-center settings" id="phoneSettings" placeholder="Phone Number (Optional)">
+                    </div><!-- /.phoneNumberSettingsGroup -->
+                    <div id="postcodeSettingsGroup" class="form-group">
+                        <input type="text" class="form-control text-center settings" id="postcodeSettings" placeholder="Postcode">
+                    </div><!-- /.postcodeSettingsGroup -->
                     <div class="settingsButtons">
                         <button data-toggle="modal" data-target="#deleteScoresModal" id="clearScoresSettingsButton" type="button" class="btn btn-danger settings">Clear My Scores</button>
                         <button data-toggle="modal" data-target="#deleteAccountModal" id="deleteAccountSettingsButton" type="button" class="btn btn-danger settings">Delete My Account</button>

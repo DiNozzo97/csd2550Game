@@ -213,8 +213,14 @@ function processSettings() {
         totalErrors.push("#emailSettings");
         validationPassed = false;
     }
+    if ($('#postcodeSettings').val() == '') {
+        $("#postcodeSettingsGroup").addClass("has-error");
+        emptyFields.push("Postcode");
+        totalErrors.push("#postcodeSettings");
+        validationPassed = false;
+    }
 
-    // check to see whether the firstName/lastName/email inputs match a regex expression to check data validity, if not, make the input glow red (class has-error), add it to the invalidNames array and the totalErrors array (used to check at the end which fields have failed validation)
+    // check to see whether the firstName/lastName/email/phoneNumber(if entered) inputs match a regex expression to check data validity, if not, make the input glow red (class has-error), add it to the invalidNames array and the totalErrors array (used to check at the end which fields have failed validation)
     if (!(/^[-'a-zA-Z ]*$/.test($('#firstNameSettings').val()))) {
         $("#firstNameSettingsGroup").addClass("has-error");
         invalidNames.push("First Name");
@@ -231,6 +237,19 @@ function processSettings() {
         $("#emailSettingsGroup").addClass("has-error");
         invalidNames.push("Email Address");
         totalErrors.push("#emailSettingsGroup");
+        validationPassed = false;
+    }
+    if ((!(/(\+44|0)\d{10}/.test($('#phoneSettings').val()))) && ($('#phoneSettings').val() != '')) {
+        $("#phoneNumberSettingsGroup").addClass("has-error");
+        invalidNames.push("Phone Number");
+        totalErrors.push("#phoneNumberSettingsGroup");
+        validationPassed = false;
+    }
+    // Check the validity of the post code, if it is not true then make the input glow red (class has-error), add it to the invalidNames array and the totalErrors array (used to check at the end which fields have failed validation)
+    if (!validatePostcode($('#postcodeSettings').val())) {
+        $("#postcodeSettingsGroup").addClass("has-error");
+        invalidNames.push("Postcode");
+        totalErrors.push("#postcodeSettings");
         validationPassed = false;
     }
     // See if the email address is already registered (by searching through each existing users email address)
@@ -274,7 +293,7 @@ function processSettings() {
             passwordHash = $.md5(salt + $('#passwordSettings').val());
         }
         // now update the user
-        editUser($('#firstNameSettings').val(), $('#lastNameSettings').val(), $('#emailSettings').val(), salt, passwordHash, $("#publicScoresSettings").is(':checked'));
+        editUser($('#firstNameSettings').val(), $('#lastNameSettings').val(), $('#emailSettings').val(), salt, passwordHash, $('#phoneSettings').val(), $('#postcodeSettings').val(), $("#publicScoresSettings").is(':checked'));
 
         // Hide the settings modal
         $('#settingsModal').modal('hide');
@@ -318,7 +337,7 @@ function processSettings() {
         alertActivator("settings", "danger", errorMessage, false);
 
         // Make all valid inputs (inputs that aren't in the totalError array) green (class has-success)
-        var allInputGroups = ["#firstNameSettingsGroup", "#lastNameSettingsGroup", "#emailSettingsGroup", "#passwordSettingsGroup"];
+        var allInputGroups = ["#firstNameSettingsGroup", "#lastNameSettingsGroup", "#emailSettingsGroup", "#passwordSettingsGroup", "#phoneNumberSettingsGroup", "#postcodeSettingsGroup"];
         $.each(allInputGroups, function(index, value) {
             if ($.inArray(value, totalErrors) == -1) {
                 $( value ).addClass( "has-success" );
@@ -329,7 +348,7 @@ function processSettings() {
 }
 
 // The function editUser will update the users details in Local Storage
-function editUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
+function editUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, phoneNumber, postcode, postScores) {
     var usersObj = JSON.parse(localStorage.users), // convert the JSON string in to a JS object
         arrayPos = sessionStorage.currentArrayPosition; // get the array position of the user to update from Session Storage
     // Update the details in the object
@@ -338,6 +357,8 @@ function editUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
     usersObj[arrayPos].emailAddress = emailAdr;
     usersObj[arrayPos].passwordSalt = pwdSalt;
     usersObj[arrayPos].passwordHash = pwdHash;
+    usersObj[arrayPos].phoneNumber = phoneNumber;
+    usersObj[arrayPos].postcode = postcode;
     usersObj[arrayPos].saveScore = postScores;
 
     localStorage.users = JSON.stringify(usersObj); // Convert the Object back in to a JSON string and save it back in localstorage
@@ -351,11 +372,17 @@ function editUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
 
 // The function resetSettings will initialise the settings data in the settings input boxes
 function resetSettings() {
+    var usersObj = JSON.parse(localStorage.users), // convert the JSON string in to a JS object
+        arrayPos = sessionStorage.currentArrayPosition; // get the array position of the user to update from Session Storage
+    
     $('#firstNameSettings').val(sessionStorage.currentFirstName);
     $('#lastNameSettings').val(sessionStorage.currentLastName);
     $('#emailSettings').val(sessionStorage.currentEmail);
     $('#confirmPasswordSettings').val('');
     $('#passwordSettings').val('');
+    $('#phoneSettings').val(usersObj[arrayPos].phoneNumber);
+    $('#postcodeSettings').val(usersObj[arrayPos].postcode);
+    
     if (sessionStorage.currentPostToScores == "true") 
         $('#publicScoresSettings').bootstrapSwitch('state', true);
     else
