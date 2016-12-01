@@ -62,7 +62,7 @@
                         <input type="password" class="form-control text-center register" id="confirmPasswordRegister" placeholder="Confirm Password">
                     </div><!-- /.passwordRegisterGroup -->
                     <div id="phoneNumberRegisterGroup" class="form-group">
-                        <input type="text" class="form-control text-center register" id="phoneRegister" placeholder="Phone Number (Optional)">
+                        <input type="text" class="form-control text-center register" id="phoneRegister" placeholder="UK Phone Number (Optional)">
                     </div><!-- /.phoneNumberGroup -->
                     <div id="postcodeRegisterGroup" class="form-group">
                         <input type="text" class="form-control text-center register" id="postcodeRegister" placeholder="Postcode">
@@ -133,7 +133,7 @@
                         <input type="password" class="form-control text-center settings" id="confirmPasswordSettings" placeholder="Confirm Password">
                     </div><!-- /.passwordSettingsGroup -->
                     <div id="phoneNumberSettingsGroup" class="form-group">
-                        <input type="text" class="form-control text-center settings" id="phoneSettings" placeholder="Phone Number (Optional)">
+                        <input type="text" class="form-control text-center settings" id="phoneSettings" placeholder="UK Phone Number (Optional)">
                     </div><!-- /.phoneNumberSettingsGroup -->
                     <div id="postcodeSettingsGroup" class="form-group">
                         <input type="text" class="form-control text-center settings" id="postcodeSettings" placeholder="Postcode">

@@ -87,7 +87,7 @@ function processRegistration() {
     }
     if ((!(/(\+44|0)\d{10}/.test($('#phoneRegister').val()))) && ($('#phoneRegister').val() != '')) {
         $("#phoneNumberRegisterGroup").addClass("has-error");
-        invalidNames.push("Phone Number");
+        invalidNames.push("UK Phone Number");
         totalErrors.push("#phoneNumberRegisterGroup");
         validationPassed = false;
     }
@@ -241,7 +241,7 @@ function processSettings() {
     }
     if ((!(/(\+44|0)\d{10}/.test($('#phoneSettings').val()))) && ($('#phoneSettings').val() != '')) {
         $("#phoneNumberSettingsGroup").addClass("has-error");
-        invalidNames.push("Phone Number");
+        invalidNames.push("UK Phone Number");
         totalErrors.push("#phoneNumberSettingsGroup");
         validationPassed = false;
     }
