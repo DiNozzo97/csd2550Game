@@ -61,6 +61,12 @@
                         <input type="password" class="form-control text-center register" id="passwordRegister" placeholder="Password">
                         <input type="password" class="form-control text-center register" id="confirmPasswordRegister" placeholder="Confirm Password">
                     </div><!-- /.passwordRegisterGroup -->
+                    <div id="phoneNumberRegisterGroup" class="form-group">
+                        <input type="text" class="form-control text-center register" id="phoneRegister" placeholder="Phone Number (Optional)">
+                    </div><!-- /.phoneNumberGroup -->
+                    <div id="postcodeRegisterGroup" class="form-group">
+                        <input type="text" class="form-control text-center register" id="postcodeRegister" placeholder="Postcode">
+                    </div><!-- /.postcodeGroup -->
                     <div class="checkbox register">
                         <label for="publicScoresRegister">Post my scores to the public scoreboard</label>
                         <input class="pull-right" type="checkbox" value="true" id="publicScoresRegister" checked data-size="mini" data-on-color="primary" data-off-color="default" data-on-text="Yes" data-off-text="No">

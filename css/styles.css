@@ -84,6 +84,5 @@ a:focus {
 /* Canvas Style/position */
 #mainCanvas {
     border: 2px solid black; 
-/*    background-color: rgba(0, 0, 0, 1);*/
     margin-top: 28px;
 }

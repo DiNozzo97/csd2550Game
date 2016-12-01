@@ -59,8 +59,14 @@ function processRegistration() {
         totalErrors.push("#passwordRegister");
         validationPassed = false;
     }
+    if ($('#postcodeRegister').val() == '') {
+        $("#postcodeRegisterGroup").addClass("has-error");
+        emptyFields.push("Postcode");
+        totalErrors.push("#postcodeRegister");
+        validationPassed = false;
+    }
 
-    // check to see whether the firstName/lastName/email inputs match a regex expression to check data validity, if not, make the input glow red (class has-error), add it to the invalidNames array and the totalErrors array (used to check at the end which fields have failed validation)
+    // check to see whether the firstName/lastName/email/phoneNumber(if entered) inputs match a regex expression to check data validity, if not, make the input glow red (class has-error), add it to the invalidNames array and the totalErrors array (used to check at the end which fields have failed validation)
     if (!(/^[-'a-zA-Z ]*$/.test($('#firstNameRegister').val()))) {
         $("#firstNameRegisterGroup").addClass("has-error");
         invalidNames.push("First Name");
@@ -77,6 +83,19 @@ function processRegistration() {
         $("#emailRegisterGroup").addClass("has-error");
         invalidNames.push("Email Address");
         totalErrors.push("#emailRegisterGroup");
+        validationPassed = false;
+    }
+    if ((!(/(\+44|0)\d{10}/.test($('#phoneRegister').val()))) && ($('#phoneRegister').val() != '')) {
+        $("#phoneNumberRegisterGroup").addClass("has-error");
+        invalidNames.push("Phone Number");
+        totalErrors.push("#phoneNumberRegisterGroup");
+        validationPassed = false;
+    }
+    // Check the validity of the post code, if it is not true then make the input glow red (class has-error), add it to the invalidNames array and the totalErrors array (used to check at the end which fields have failed validation)
+    if (!validatePostcode($('#postcodeRegister').val())) {
+        $("#postcodeRegisterGroup").addClass("has-error");
+        invalidNames.push("Postcode");
+        totalErrors.push("#postcodeRegister");
         validationPassed = false;
     }
     // See if the email address is already registered (by searching through each existing users email address)
@@ -109,13 +128,15 @@ function processRegistration() {
         for(var i=0; i < 4; i++ )
             salt += charset.charAt(Math.floor(Math.random() * charset.length));
         // add the user and hash the password + SALT in the process
-        addUser($('#firstNameRegister').val(), $('#lastNameRegister').val(), lwrEmailAddress, salt, $.md5(salt + $('#passwordRegister').val()), $("#publicScoresRegister").is(':checked'));
+        addUser($('#firstNameRegister').val(), $('#lastNameRegister').val(), lwrEmailAddress, salt, $.md5(salt + $('#passwordRegister').val()), $('#phoneRegister').val(), $('#postcodeRegister').val(), $("#publicScoresRegister").is(':checked'));
         // Hide the sign up modal
         $('#registerModal').modal('hide');
         // Display an alert on the login screen to the user
         alertActivator("signIn", "success", "You have successfully registered your account, sign in below:", true)
-        // Clear the form, incase another user wants to sign up without refreshing the page
+        // Clear the form/alerts, incase another user wants to sign up without refreshing the page
         $("#registerForm").trigger('reset');
+        $('.alert.register').hide();
+
     } else { // If Validation failed, check the status of the various validation checks and display the relevant errors (with correct grammer)
         var errorMessage = "";
         if (emptyFields.length > 0) {
@@ -150,7 +171,7 @@ function processRegistration() {
         alertActivator("register", "danger", errorMessage, false);
 
         // Make all valid inputs (inputs that aren't in the totalError array) green (class has-success)
-        var allInputGroups = ["#firstNameRegisterGroup", "#lastNameRegisterGroup", "#emailRegisterGroup", "#passwordRegisterGroup"];
+        var allInputGroups = ["#firstNameRegisterGroup", "#lastNameRegisterGroup", "#emailRegisterGroup", "#passwordRegisterGroup", "#phoneNumberRegisterGroup", "#postcodeRegisterGroup"];
         $.each(allInputGroups, function(index, value) {
             if ($.inArray(value, totalErrors) == -1) {
                 $( value ).addClass( "has-success" );
@@ -393,8 +414,37 @@ function alertActivator(location, type, message, closable) {
 
 // The function activateNavButton will add 'active' class to called button and remove 'active' class from other buttons
 function activateNavButton(buttonID) {
-    $( ".active" ).removeClass( "active" )
+    $( ".active" ).removeClass( "active" );
     $( "#"+buttonID ).addClass( "active" );
+}
+
+// The function validatePostcode will check the validity of the inputted postcode
+function validatePostcode(postcode) {
+    // Declare variable in scope of the function
+    var result;
+    // Strip/Sanatize any non alpha-numeric characters from the postcode (as it will be used inside a URL in the GET request)
+    postcode = postcode.replace(/\W/g, '');
+    // see if postcode is empty (after removing any non numerical characters)
+    if (postcode == '')
+        return false;
+    // Form and store the URL to use in the get request
+    var validationURL = "http://api.postcodes.io/postcodes/" + postcode + "/validate";
+    // Create an ajax request that fires a get request to the API
+    $.ajax({
+        type: 'GET',
+        url: validationURL,
+        dataType: 'json',
+        // 
+        success: function( data ) {
+            // Store the validity result from the API in a variable
+            result = data.result;
+        },
+        data: {},
+        // I have made it synchronous in order to easily access the variable outside of the ajax request
+        async: false
+    });
+    // Return the result
+    return result;
 }
 
 // The function checkLoginStatus can be called to check login status and show the appropriate navigation items
@@ -415,7 +465,7 @@ function checkLoginStatus() {
 }
 
 // The addUser function will add a user to local storage (after the data has been validated)
-function addUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
+function addUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, phoneNumber, postcode, postScores) {
     // parse existing JSON array into an object
     var usersObj = JSON.parse(localStorage.users);
     var newUserObj = {
@@ -425,6 +475,8 @@ function addUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, postScores) {
         emailAddress: emailAdr,
         passwordSalt: pwdSalt,
         passwordHash: pwdHash,
+        phoneNumber: phoneNumber,
+        postcode: postcode,
         saveScore: postScores,
         highScore: 0,
     };
