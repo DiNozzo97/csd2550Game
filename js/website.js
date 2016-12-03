@@ -374,7 +374,7 @@ function editUser(firstName, lastName, emailAdr, pwdSalt, pwdHash, phoneNumber, 
 function resetSettings() {
     var usersObj = JSON.parse(localStorage.users), // convert the JSON string in to a JS object
         arrayPos = sessionStorage.currentArrayPosition; // get the array position of the user to update from Session Storage
-    
+
     $('#firstNameSettings').val(sessionStorage.currentFirstName);
     $('#lastNameSettings').val(sessionStorage.currentLastName);
     $('#emailSettings').val(sessionStorage.currentEmail);
@@ -382,7 +382,7 @@ function resetSettings() {
     $('#passwordSettings').val('');
     $('#phoneSettings').val(usersObj[arrayPos].phoneNumber);
     $('#postcodeSettings').val(usersObj[arrayPos].postcode);
-    
+
     if (sessionStorage.currentPostToScores == "true") 
         $('#publicScoresSettings').bootstrapSwitch('state', true);
     else
@@ -424,7 +424,15 @@ function processSignIn() {
         }
     }
 
-    if (userAuthenticated == false) { // if the user didn't enter a matching email/password
+    if (userAuthenticated == false && $('#emailSignIn').val() == "") { // if the user didn't enter an email address
+        $("#signInGroup").addClass("has-error"); // make the inputs glow red
+        alertActivator("signIn", "danger", "Please enter an email address", false); // alert the user that they didn't enter an email address
+    }
+    else if (userAuthenticated == false && $('#passwordSignIn').val() == "") { // if the user didn't enter a password
+        $("#signInGroup").addClass("has-error"); // make the inputs glow red
+        alertActivator("signIn", "danger", "Please enter a password", false); // alert the user that they didn't enter a password
+    }
+    else if (userAuthenticated == false ) { // if the user didn't enter a matching email/password
         $("#signInGroup").addClass("has-error"); // make the inputs glow red
         alertActivator("signIn", "danger", "Incorrect email/password combination", false); // alert the user that they didn't enter the correct credentials (not too specific for security reasons)
     }
